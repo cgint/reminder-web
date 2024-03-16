@@ -9,7 +9,7 @@
   let info_links = "";
   let info_graphs = "";
   let gpt_analysis = "";
-  let gpt_source = "";
+  let gpt_info = "";
   let keyValuePairs = {};
   let processing = false;
 
@@ -77,13 +77,13 @@
   }
   async function gptAnalysis() {
     try {
-      gpt_source = ""
+      gpt_info = ""
       gpt_analysis = 'Analysing. Please wait...';
       axios.get(
         `${api_url}/gpt/analysis/${userInput}/yfinance`, { headers: { 'password': password } }
       ).then(response => {
         gpt_analysis = response.data['analysis'];
-        gpt_source = " ("+response.data['source']+")";
+        gpt_info = " ("+response.data['source']+" for "+response.data['ticker']+")";
       }).catch(error => {
         console.error("Error fetching data:", error);
         gpt_analysis =  "Error fetching data: " + error;
@@ -146,7 +146,7 @@
         <td valign="top"><strong>
           Links:</strong><br/>{@html info_links}
           <br/><br/>
-          <strong>GPT-Analysis{gpt_source}:</strong><br/><i>{@html gpt_analysis}</i>
+          <strong>GPT-Analysis{gpt_info}:</strong><br/><i>{@html gpt_analysis}</i>
         </td>
       </tr>
     </table>
