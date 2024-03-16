@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import axios from "axios";
 
-  let api_url = "http://localhost:8000";
+  let api_url = import.meta.env.VITE_BACKEND_URL;
   
   let userInput = "";
   let password = "";
