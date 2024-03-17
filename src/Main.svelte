@@ -1,5 +1,5 @@
 <script>
-    import { onMount, createEventDispatcher } from 'svelte';
+    import { onMount } from 'svelte';
     import App from './App.svelte';
   
     let isAuthenticated = false;
