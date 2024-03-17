@@ -34,6 +34,17 @@
       processing = false;
     }
   }
+  async function deleteTodaysCacheInput() {
+    processing = true;
+    try {
+      if (userInput) {
+        userInput = userInput.toUpperCase();
+        await deleteTodaysCache()
+      }
+    } finally {
+      processing = false;
+    }
+  }
   async function createInfoLinks() {
     let curtimeEpoch = Math.floor(Date.now() / 1000);
     let linksToCreate = {
@@ -93,6 +104,19 @@
       console.error("Error fetching gpt analysis:", error);
     }
   }
+  async function deleteTodaysCache() {
+    try {
+      await axios.delete(
+        `${api_url}/cache/${userInput}/today`, { headers: { 'password': password } }
+      ).then(response => {
+        console.log("response:", response);
+      }).catch(error => {
+        console.error("Error deleting cache:", error);
+      });
+    } catch (error) {
+      console.error("Error deleting cache:", error);
+    }
+  }
   function handleKeyDown(event) {
     if (event.key === "Enter") {
       processInput();
@@ -116,8 +140,9 @@
 <input type="text" bind:value={userInput} placeholder="Ticker-Symbol 'T', ..." on:keydown={handleKeyDown} />
 <input type="password" bind:value={password} placeholder="Password" on:keydown={handleKeyDown} />
 <button on:click={processInput}>Fetch Data</button>
+<button on:click={deleteTodaysCacheInput}>Delete todays cache</button>
 {#if processing}
-  <span>Loading...</span>
+  <span>Processing...</span>
 {/if}
 {#if info_links}
   <div class="infos" style="overflow: hidden;">
