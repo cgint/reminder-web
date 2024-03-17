@@ -1,5 +1,5 @@
 {
-  "name": "fin-ass-we",
+  "name": "fin-ass-web",
   "version": "1.0.0",
   "scripts": {
     "dev": "vite",
@@ -11,8 +11,8 @@
     "svelte": "^4.2.12",
     "vite": "^5.0.0",
     "axios": "^0.28.0",
-    "rollup": "",
     "@sveltejs/vite-plugin-svelte": "^3.0.2",
+    "rollup": "",
     "wrangler": "^3.34.2"
   }
 }
