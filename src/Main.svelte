@@ -18,7 +18,6 @@
         }
         isAuthenticated = true;
     }
-
     function googleLoginInit() {
         google.accounts.id.initialize({
             client_id: "144501535534-cc4hm6rceqoiur9oavrr5mihjkhm0leg.apps.googleusercontent.com",
@@ -26,7 +25,7 @@
         });
         google.accounts.id.renderButton(
             document.getElementById("buttonDiv"),
-            { theme: "outline", size: "large" }
+            { theme: "outline", size: "large", text: "signin_with", locale: "en" }
         );
         google.accounts.id.prompt(); // also display the One Tap dialog
     }
