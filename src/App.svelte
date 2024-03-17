@@ -27,6 +27,7 @@
     processing = true;
     try {
       if (userInput) {
+        userInput = userInput.toUpperCase();
         await Promise.all([createInfoLinks(), createInfoGraphs(), fetchData(), gptAnalysis()]);
       }
     } finally {
