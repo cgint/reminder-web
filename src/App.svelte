@@ -74,7 +74,7 @@
   async function fetchData() {
     try {
       keyValuePairs = {'Loading.': 'Please wait...'};
-      axios.get(
+      await axios.get(
         `${api_url}/data/${userInput}`, { headers: { 'password': password } }
       ).then(response => {
         console.log("response:", response);
@@ -91,7 +91,7 @@
     try {
       gpt_info = ""
       gpt_analysis = 'Analysing. Please wait...';
-      axios.get(
+      await axios.get(
         `${api_url}/gpt/analysis/${userInput}/yfinance`, { headers: { 'password': password } }
       ).then(response => {
         gpt_analysis = response.data['analysis'];
