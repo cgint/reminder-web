@@ -121,7 +121,7 @@
 {/if}
 {#if info_links}
   <div class="infos" style="overflow: hidden;">
-    <h3>Infos:</h3>
+    <h3>Infos (Data is cached on same calendar day):</h3>
     <table cellpadding="10">
       <thead class="highlight">
         <tr>
