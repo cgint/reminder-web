@@ -114,7 +114,7 @@
 </script>
 
 <input type="text" bind:value={userInput} placeholder="Ticker-Symbol 'T', ..." on:keydown={handleKeyDown} />
-<input type="password" bind:value={password} placeholder="Password" />
+<input type="password" bind:value={password} placeholder="Password" on:keydown={handleKeyDown} />
 <button on:click={processInput}>Fetch Data</button>
 {#if processing}
   <span>Loading...</span>
