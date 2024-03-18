@@ -16,7 +16,6 @@
         } else {
             isAuthenticated = false;
         }
-        isAuthenticated = true;
     }
     function googleLoginInit() {
         google.accounts.id.initialize({
