@@ -3,20 +3,18 @@
     import App from './App.svelte';
   
     let isAuthenticated = false;
-    let userEmail = ''; // Declare a variable to store the user's email
+    let userEmail = '';
 
     onMount(() => {
-        checkAuthentication();
+        checkAuthenticationOnLoad();
         if (!isAuthenticated) {
             googleLoginInit();
         }
     });
 
-    function checkAuthentication() {
-        // Check if the user's authentication status and email are stored in localStorage
-        const isUserAuthenticated = localStorage.getItem('isAuthenticated');
-        userEmail = localStorage.getItem('userEmail');
-        isAuthenticated = isUserAuthenticated === 'true';
+    function checkAuthenticationOnLoad() {
+        isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+        userEmail = isAuthenticated ? localStorage.getItem('userEmail') : '';
     }
 
     function handleCredentialResponse(response) {
@@ -25,14 +23,12 @@
         if (payload.email === "christian.gintenreiter@gmail.com") {
             isAuthenticated = true;
             userEmail = payload.email; // Update the userEmail variable
-            localStorage.setItem('isAuthenticated', 'true');
-            localStorage.setItem('userEmail', userEmail); // Store the user's email in localStorage
         } else {
             isAuthenticated = false;
-            userEmail = ''; // Clear the userEmail variable
-            localStorage.setItem('isAuthenticated', 'false');
-            localStorage.removeItem('userEmail'); // Remove the user's email from localStorage
+            userEmail = '';
         }
+        localStorage.setItem('isAuthenticated', isAuthenticated.toString());
+        localStorage.setItem('userEmail', userEmail);
     }
     function googleLoginInit() {
         google.accounts.id.initialize({
