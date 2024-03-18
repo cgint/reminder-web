@@ -191,12 +191,16 @@
     }
   }
   function activateLinksGptData() {
-    linksInfoOrNews = "info";
-    processInputIfSet();
+    if (linksInfoOrNews != "info") {
+      linksInfoOrNews = "info";
+      processInputIfSet();
+    }
   }
   function activateNewsGptNews() {
-    linksInfoOrNews = "news";
-    processInputIfSet();
+    if (linksInfoOrNews != "news") {
+      linksInfoOrNews = "news";
+      processInputIfSet();
+    }
   }
   // Add event listener to set focus on input when 'f' key is pressed
   window.addEventListener("keydown", (event) => {
@@ -217,15 +221,16 @@
 {#if info_links}
   <div class="infos" style="overflow: hidden;">
     <h3>Infos (Data is cached on same calendar day):</h3>
-    <table cellpadding="10">
-      <thead class="highlight">
+    <table cellpadding="0">
+      <thead>
         <tr>
           <td class="data">Numbers</td>
           <td class="graphs">Graphs</td>
           <td class="links">
-            <a on:click={activateLinksGptData} href="#">Links/GPT-Data-Analysis</a>
-             or 
-            <a on:click={activateNewsGptNews} href="#">News/GPT-News-Analysis</a>
+            <div class="link-options">
+              <div on:click={activateLinksGptData} class:active={linksInfoOrNews === 'info'}>Links/GPT-Data-Analysis</div>
+              <div on:click={activateNewsGptNews} class:active={linksInfoOrNews === 'news'}>News/GPT-News-Analysis </div>
+            </div>
           </td>
         </tr>
       </thead>
@@ -268,9 +273,16 @@
 {/if}
 
 <style>
-  .infos table thead.highlight {
+  .infos table thead td {
     font-weight: bold;
     background-color: lightblue;
+    padding: 0px;
+  }
+  .infos table thead td.data {
+    padding: 5px;
+  }
+  .infos table thead td.graphs {
+    padding: 5px;
   }
   .infos table .content {
     background-color: lightgray;
@@ -284,4 +296,17 @@
   .infos td.links {
     width: 900px;
   }
+  .infos .link-options {
+    display: flex;
+  }
+  .infos .link-options div {
+    cursor: pointer;
+    padding-left: 5px;
+    flex: 1;
+  }
+  .infos .link-options div.active {
+    font-weight: bold;
+    background-color: rgb(58, 185, 227);
+  }
+
 </style>
