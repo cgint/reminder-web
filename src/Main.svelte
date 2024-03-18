@@ -45,8 +45,7 @@
     function logout() {
         isAuthenticated = false;
         userEmail = '';
-        localStorage.setItem('isAuthenticated', 'false');
-        localStorage.removeItem('userEmail');
+        localStorage.clear();
         window.location.reload();
     }
 </script>

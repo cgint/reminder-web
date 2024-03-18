@@ -14,6 +14,7 @@
   let processing = false;
 
   onMount(() => {
+    fetchUserFieldsFromStorage();
     const urlParams = new URLSearchParams(window.location.search);
     const ticker = urlParams.get("ticker");
     if (ticker) {
@@ -23,11 +24,27 @@
     focus_on_ticker_input();
   });
 
+  function storeUserFieldsInStorage(userInput, password) {
+    localStorage.setItem('userInput', userInput);
+    localStorage.setItem('password', password);
+  }
+  function fetchUserFieldsFromStorage() {
+    userInput = localStorage.getItem('userInput') || "";
+    password = localStorage.getItem('password') || "";
+  }
+
+  function getUpperCaseInputForAction() {
+    if (userInput) {
+      userInput = userInput.toUpperCase();
+      storeUserFieldsInStorage(userInput, password);
+    }
+    return userInput;
+  }
+
   async function processInput() {
     processing = true;
     try {
-      if (userInput) {
-        userInput = userInput.toUpperCase();
+      if (getUpperCaseInputForAction()) {
         await Promise.all([createInfoLinks(), createInfoGraphs(), fetchData(), gptAnalysis()]);
       }
     } finally {
@@ -37,8 +54,7 @@
   async function deleteTodaysCacheInput() {
     processing = true;
     try {
-      if (userInput) {
-        userInput = userInput.toUpperCase();
+      if (getUpperCaseInputForAction()) {
         await deleteTodaysCache()
       }
     } finally {
