@@ -126,6 +126,7 @@
     const input = document.querySelector("input");
     if (input) {
       input.focus();
+      input.select();
     }
   }
   // Add event listener to set focus on input when 'f' key is pressed
