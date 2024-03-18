@@ -95,8 +95,8 @@
   }
   async function fetchData() {
     try {
-      infos_ticker_name = "";
-      info_key_value_pairs = {'Loading.': 'Please wait...'};
+      // infos_ticker_name = "";
+      // info_key_value_pairs = {'Loading.': 'Please wait...'};
       await axios.get(
         `${api_url}/data/${userInput}`, { headers: { 'password': password } }
       ).then(response => {
@@ -121,8 +121,8 @@
   }
   async function load_info_gpt_analysis() {
     try {
-      gpt_info_info = ""
-      gpt_info_analysis = 'Analysing. Please wait...';
+      // gpt_info_info = ""
+      // gpt_info_analysis = 'Analysing. Please wait...';
       await axios.get(
         `${api_url}/gpt/analysis/${userInput}/yfinance`, { headers: { 'password': password } }
       ).then(response => {
@@ -138,7 +138,7 @@
   }
   async function load_news_links() {
     try {
-      news_links_list = [];
+      // news_links_list = [];
       await axios.get(
         `${api_url}/data/${userInput}/news/overview`, { headers: { 'password': password } }
       ).then(response => {
@@ -153,8 +153,8 @@
   }
   async function load_news_gpt_analysis() {
     try {
-      gpt_news_info = ""
-      gpt_news_analysis = 'Analysing. Please wait...';
+      // gpt_news_info = ""
+      // gpt_news_analysis = 'Analysing. Please wait...';
       await axios.get(
         `${api_url}/gpt/analysis/${userInput}/news`, { headers: { 'password': password } }
       ).then(response => {
