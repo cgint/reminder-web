@@ -252,19 +252,28 @@
         <td class="content" valign="top">{@html info_graphs}</td>
         <td class="content" valign="top">
           {#if linksInfoOrNews == "info"}
-          <strong>Links:</strong><br/>{@html info_links}
+          <strong>Links:</strong><br/>
+          <div class="contentindent">
+            {@html info_links}
+          </div>
           <br/><br/>
           <strong>GPT-Info-Analysis{gpt_info_info}:</strong><br/>
-          <i>{@html gpt_info_analysis}</i>
+          <div class="contentindent">
+            <i>{@html gpt_info_analysis}</i>
+          </div>
           {/if}
           {#if linksInfoOrNews == "news"}
           <strong>News:</strong><br/>
-          {#each news_links_list as news_link}
-            <a href="{news_link['link']}" target="_blank">{news_link['title']}</a><br/>
-          {/each}
+          <div class="contentindent">
+            {#each news_links_list as news_link}
+              <a href="{news_link['link']}" target="_blank">{news_link['title']}</a><br/>
+            {/each}
+          </div>
           <br/><br/>
           <strong>GPT-News-Analysis{gpt_news_info}:</strong><br/>
-          <i>{@html gpt_news_analysis}</i>
+          <div class="contentindent">
+              <i>{@html gpt_news_analysis}</i>
+          </div>
           {/if}
         </td>
       </tr>
@@ -287,6 +296,9 @@
   .infos table td.content {
     background-color: lightgray;
     padding: 5px;
+  }
+  .infos table div.contentindent {
+    padding-left: 5px;
   }
   .infos td.data {
     width: 420px;
