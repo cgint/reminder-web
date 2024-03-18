@@ -19,8 +19,8 @@
     const ticker = urlParams.get("ticker");
     if (ticker) {
       userInput = ticker;
-      processInput();
     }
+    processInputIfSet();
     focus_on_ticker_input();
   });
 
@@ -41,7 +41,7 @@
     return userInput;
   }
 
-  async function processInput() {
+  async function processInputIfSet() {
     processing = true;
     try {
       if (getUpperCaseInputForAction()) {
@@ -135,7 +135,7 @@
   }
   function handleKeyDown(event) {
     if (event.key === "Enter") {
-      processInput();
+      processInputIfSet();
     }
   }
   function focus_on_ticker_input() {
@@ -156,7 +156,7 @@
 
 <input type="text" bind:value={userInput} placeholder="Ticker-Symbol 'T', ..." on:keydown={handleKeyDown} />
 <input type="password" bind:value={password} placeholder="Password" on:keydown={handleKeyDown} />
-<button on:click={processInput}>Fetch Data</button>
+<button on:click={processInputIfSet}>Fetch Data</button>
 <button on:click={deleteTodaysCacheInput}>Delete todays cache</button>
 {#if processing}
   <span>Processing...</span>
