@@ -8,10 +8,15 @@
   let password = "";
   let info_links = "";
   let info_graphs = "";
-  let gpt_analysis = "";
-  let gpt_info = "";
-  let keyValuePairs = {};
+  let gpt_info_analysis = "";
+  let gpt_info_info = "";
+  let info_key_value_pairs = {};
+  let news_links_list = [];
+  let gpt_news_analysis = "";
+  let gpt_news_info = "";
+
   let processing = false;
+  let linksInfoOrNews = "info";
 
   onMount(() => {
     fetchUserFieldsFromStorage();
@@ -89,35 +94,75 @@
   }
   async function fetchData() {
     try {
-      keyValuePairs = {'Loading.': 'Please wait...'};
+      info_key_value_pairs = {'Loading.': 'Please wait...'};
       await axios.get(
         `${api_url}/data/${userInput}`, { headers: { 'password': password } }
       ).then(response => {
         console.log("response:", response);
-        keyValuePairs = response.data;
+        info_key_value_pairs = response.data;
       }).catch(error => {
         console.error("Error fetching data:", error);
-        keyValuePairs = {'Error:': "Error fetching data: " + error};
+        info_key_value_pairs = {'Error:': "Error fetching data: " + error};
       });
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   }
   async function gptAnalysis() {
+    if (linksInfoOrNews == "info") {
+      await load_info_gpt_analysis();
+    } else {
+      await load_news_links();
+      await load_news_gpt_analysis();
+    }
+  }
+  async function load_info_gpt_analysis() {
     try {
-      gpt_info = ""
-      gpt_analysis = 'Analysing. Please wait...';
+      gpt_info_info = ""
+      gpt_info_analysis = 'Analysing. Please wait...';
       await axios.get(
         `${api_url}/gpt/analysis/${userInput}/yfinance`, { headers: { 'password': password } }
       ).then(response => {
-        gpt_analysis = response.data['analysis'];
-        gpt_info = " ("+response.data['source']+" for "+response.data['ticker']+")";
+        gpt_info_analysis = response.data['analysis'];
+        gpt_info_info = " ("+response.data['source']+" for "+response.data['ticker']+")";
       }).catch(error => {
         console.error("Error fetching data:", error);
-        gpt_analysis =  "Error fetching data: " + error;
+        gpt_info_analysis = "Error fetching data: " + error;
       });
     } catch (error) {
-      console.error("Error fetching gpt analysis:", error);
+      console.error("Error fetching gpt info analysis:", error);
+    }
+  }
+  async function load_news_links() {
+    try {
+      news_links_list = [];
+      await axios.get(
+        `${api_url}/data/${userInput}/news/overview`, { headers: { 'password': password } }
+      ).then(response => {
+        news_links_list = response.data['news']['data'];
+      }).catch(error => {
+        console.error("Error fetching data:", error);
+        news_links_list = [];
+      });
+    } catch (error) {
+      console.error("Error fetching gpt news analysis:", error);
+    }
+  }
+  async function load_news_gpt_analysis() {
+    try {
+      gpt_news_info = ""
+      gpt_news_analysis = 'Analysing. Please wait...';
+      await axios.get(
+        `${api_url}/gpt/analysis/${userInput}/news`, { headers: { 'password': password } }
+      ).then(response => {
+        gpt_news_analysis = response.data['analysis'];
+        gpt_news_info = " ("+response.data['source']+" for "+response.data['ticker']+")";
+      }).catch(error => {
+        console.error("Error fetching data:", error);
+        gpt_news_analysis = "Error fetching data: " + error;
+      });
+    } catch (error) {
+      console.error("Error fetching gpt news analysis:", error);
     }
   }
   async function deleteTodaysCache() {
@@ -145,6 +190,14 @@
       input.select();
     }
   }
+  function activateLinksGptData() {
+    linksInfoOrNews = "info";
+    processInputIfSet();
+  }
+  function activateNewsGptNews() {
+    linksInfoOrNews = "news";
+    processInputIfSet();
+  }
   // Add event listener to set focus on input when 'f' key is pressed
   window.addEventListener("keydown", (event) => {
     if (event.shiftKey && event.key === "/") {
@@ -167,15 +220,21 @@
     <table cellpadding="10">
       <thead class="highlight">
         <tr>
-          <td class="data">Numbers</td><td class="graphs">Graphs</td><td class="links">Links</td>
+          <td class="data">Numbers</td>
+          <td class="graphs">Graphs</td>
+          <td class="links">
+            <a on:click={activateLinksGptData} href="#">Links/GPT-Data-Analysis</a>
+             or 
+            <a on:click={activateNewsGptNews} href="#">News/GPT-News-Analysis</a>
+          </td>
         </tr>
       </thead>
       <tr class="content">
         <td valign="top">
-          {#if Object.entries(keyValuePairs).length}
+          {#if Object.entries(info_key_value_pairs).length}
             <table>
               <tbody>
-                {#each Object.entries(keyValuePairs) as [key, value]}
+                {#each Object.entries(info_key_value_pairs) as [key, value]}
                   <tr>
                     <td>{key}</td>
                     <td>{value}</td>
@@ -186,10 +245,22 @@
           {/if}
         </td>
         <td valign="top">{@html info_graphs}</td>
-        <td valign="top"><strong>
-          Links:</strong><br/>{@html info_links}
+        <td valign="top">
+          {#if linksInfoOrNews == "info"}
+          <strong>Links:</strong><br/>{@html info_links}
           <br/><br/>
-          <strong>GPT-Analysis{gpt_info}:</strong><br/><i>{@html gpt_analysis}</i>
+          <strong>GPT-Info-Analysis{gpt_info_info}:</strong><br/>
+          <i>{@html gpt_info_analysis}</i>
+          {/if}
+          {#if linksInfoOrNews == "news"}
+          <strong>News:</strong><br/>
+          {#each news_links_list as news_link}
+            <a href="{news_link['link']}" target="_blank">{news_link['title']}</a><br/>
+          {/each}
+          <br/><br/>
+          <strong>GPT-News-Analysis{gpt_news_info}:</strong><br/>
+          <i>{@html gpt_news_analysis}</i>
+          {/if}
         </td>
       </tr>
     </table>
