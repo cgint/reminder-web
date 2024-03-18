@@ -6,6 +6,7 @@
   
   let userInput = "";
   let password = "";
+  let infos_ticker_name ="";
   let info_links = "";
   let info_graphs = "";
   let gpt_info_analysis = "";
@@ -94,12 +95,14 @@
   }
   async function fetchData() {
     try {
+      infos_ticker_name = "";
       info_key_value_pairs = {'Loading.': 'Please wait...'};
       await axios.get(
         `${api_url}/data/${userInput}`, { headers: { 'password': password } }
       ).then(response => {
         console.log("response:", response);
         info_key_value_pairs = response.data;
+        infos_ticker_name = ` for ${response.data['shortName']} (${userInput})`;
       }).catch(error => {
         console.error("Error fetching data:", error);
         info_key_value_pairs = {'Error:': "Error fetching data: " + error};
@@ -220,7 +223,7 @@
 {/if}
 {#if info_links}
   <div class="infos" style="overflow: hidden;">
-    <h3>Infos (Data is cached on same calendar day):</h3>
+    <h3>Infos{infos_ticker_name}</h3>
     <table cellpadding="0">
       <thead>
         <tr>
