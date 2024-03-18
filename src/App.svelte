@@ -234,8 +234,8 @@
           </td>
         </tr>
       </thead>
-      <tr class="content">
-        <td valign="top">
+      <tr>
+        <td class="content" valign="top">
           {#if Object.entries(info_key_value_pairs).length}
             <table>
               <tbody>
@@ -249,8 +249,8 @@
             </table>
           {/if}
         </td>
-        <td valign="top">{@html info_graphs}</td>
-        <td valign="top">
+        <td class="content" valign="top">{@html info_graphs}</td>
+        <td class="content" valign="top">
           {#if linksInfoOrNews == "info"}
           <strong>Links:</strong><br/>{@html info_links}
           <br/><br/>
@@ -284,8 +284,9 @@
   .infos table thead td.graphs {
     padding: 5px;
   }
-  .infos table .content {
+  .infos table td.content {
     background-color: lightgray;
+    padding: 5px;
   }
   .infos td.data {
     width: 420px;
@@ -308,5 +309,4 @@
     font-weight: bold;
     background-color: rgb(58, 185, 227);
   }
-
 </style>
