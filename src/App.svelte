@@ -389,27 +389,49 @@
     }
   });
 </script>
-<div class="row input wide d-none d-md-block">
-  <div class="col-12">
-    <input type="text" bind:value={userInput} placeholder="'VZ', 'T', ..." on:keydown={handleKeyDown} />
-    <input type="password" bind:value={password} placeholder="Password" on:keydown={handleKeyDown} />
-    <button on:click={processInputIfSet}>Fetch Data</button>
-    {#if userInput != ""}
-      <button on:click={deleteTodaysCacheInput}>Del stock cache today</button>
-    {/if}
+<div class="row inputfields wide d-none d-md-block">
+  <div class="col">
+    <div class="row">
+      <div class="col-auto">
+        <input type="text" bind:value={userInput} placeholder="'VZ', 'T', ..." on:keydown={handleKeyDown} class="form-control" />
+      </div>
+      <div class="col-auto">
+        <input type="password" bind:value={password} placeholder="Password" on:keydown={handleKeyDown} class="form-control" />
+      </div>
+      <div class="col-auto">
+        <button on:click={processInputIfSet} class="btn btn-primary">Fetch Data</button>
+      </div>
+      {#if userInput != ""}
+        <div class="col-auto">
+          <button on:click={deleteTodaysCacheInput} class="btn btn-warning">Del stock cache today</button>
+        </div>
+      {/if}
+    </div>
   </div>
 </div>
-<div class="row input narrow d-block d-md-none">
+<div class="row inputfields narrow d-block d-md-none">
   <div class="col-12">
-    <input type="text" bind:value={userInput} placeholder="Ticker-Symbol 'T', ..." on:keydown={handleKeyDown} />
-    <button on:click={processInputIfSet}>Fetch Data</button>
+    <div class="row">
+      <div class="col-auto">
+        <input type="text" bind:value={userInput} placeholder="Ticker-Symbol 'T', ..." on:keydown={handleKeyDown} class="form-control" />
+      </div>
+      <div class="col-auto">
+        <button on:click={processInputIfSet} class="btn btn-primary">Fetch Data</button>
+      </div>
+    </div>
   </div>
-  <div class="row input narrow d-block d-md-none">
+  <div class="row inputfields narrow d-block d-md-none">
     <div class="col-12">
-      <input type="password" bind:value={password} placeholder="Password" on:keydown={handleKeyDown} />
-      {#if userInput != ""}
-        <button on:click={deleteTodaysCacheInput}>Del stock cache today</button>
-      {/if}
+      <div class="row">
+        <div class="col-auto">
+          <input type="password" bind:value={password} placeholder="Password" on:keydown={handleKeyDown} class="form-control" />
+        </div>
+        {#if userInput != ""}
+        <div class="col-auto">
+          <button on:click={deleteTodaysCacheInput} class="btn btn-warning">Del stock cache today</button>
+        </div>
+        {/if}
+      </div>
     </div>
   </div>
 </div>
@@ -509,7 +531,10 @@
 {/if}
 
 <style>
-  div.input input {
+  div.inputfields {
+    margin-top: 5px;
+  }
+  div.inputfields input {
     width: 5em;
   }
   .processingtext {
