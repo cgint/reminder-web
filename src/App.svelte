@@ -181,7 +181,7 @@
   }
   async function createSaticInfoGraphs() {
     info_graphs = "";
-    let img_style = 'style="width: 100%; height: auto;"';
+    let img_style = 'style="width: 100%; height: auto; padding-top: 5px;"';
     info_graphs += `<a href="https://finviz.com/quote.ashx?t=${userInput}&p=m" target="_blank"><img ${img_style} src="https://charts2-node.finviz.com/chart.ashx?cs=m&t=${userInput}&tf=d&s=linear&ct=candle_stick"/></a>`;
     let history_graph_12m_url = `${api_url}/image/history/${userInput}/period/12mo`;
     info_graphs += `<a href="${history_graph_12m_url}" target="_blank"><img ${img_style} src="${history_graph_12m_url}"/></a>`;
@@ -399,16 +399,20 @@
 {/if}
 {#if info_links}
   <div class="infos" style="overflow: hidden;">
-    <h3>Infos{infos_ticker_name}</h3>
     <div class="row">
+      <div class="col-12">
+        <h3>Infos{infos_ticker_name}</h3>
+      </div>
+    </div>
+    <div class="row contentrow">
       <div class="col-md-3 col-sm-12">
         <div class="row">
-          <div class="col-12 columnheader">
+          <div class="col-12 columnheader textonly">
             Numbers
           </div>
         </div>
         <div class="row">
-          <div class="col-12">
+          <div class="col-12 columncontent">
             {#if Object.entries(info_key_value_pairs).length}
             <table class="info_key_value_table">
               <tbody>
@@ -431,12 +435,12 @@
       </div>
       <div class="col-md-2 col-sm-12">
         <div class="row">
-          <div class="col-12 columnheader">
+          <div class="col-12 columnheader textonly">
             Graphs
           </div>
         </div>
         <div class="row">
-          <div class="col-12">
+          <div class="col-12 columncontent">
             <div class="graphs_wrapper">
               {@html info_graphs}
             </div>
@@ -446,15 +450,13 @@
 
       <div class="col-md-7 col-sm-12">
         <div class="row">
-          <div class="col-12 columnheader">
-            <div class="link-options">
+          <div class="col-12 columnheader link-options">
               <div on:click={activateLinksAndGptInfo} class:active={linksInfoOrNews === 'info'}>Links/GPT-Data-Analysis</div>
               <div on:click={activateNewsAndGptNews} class:active={linksInfoOrNews === 'news'}>News/GPT-News-Analysis </div>
-            </div>
           </div>
         </div>
         <div class="row">
-          <div class="col-12">
+          <div class="col-12 columncontent">
             {#if linksInfoOrNews == "info"}
             <strong>Links:</strong><br/>
             <div class="contentindent">
@@ -494,14 +496,22 @@
     font-style: italic;
     color: black;
   }
+  .infos .contentrow {
+    background-color: lightgray;
+  }
   .infos .graphs_wrapper {
     display: block;
     width: 100%;
   }
+  .infos .columnheader.textonly {
+    padding-left: 15px;
+  }
   .infos .columnheader {
     font-weight: bold;
     background-color: lightblue;
-    padding: 0px;
+  }
+  .infos .columncontent {
+    padding-left: 15px;
   }
   .infos div.contentindent {
     padding-left: 5px;
