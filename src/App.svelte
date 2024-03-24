@@ -18,6 +18,8 @@
   let info_key_value_pairs = {};
   let info_key_value_prev_input = "";
   
+  let linksInfoOrNews = "info";
+  
   let news_links_list = [];
   let news_links_prev_input = "";
   
@@ -25,8 +27,10 @@
   let gpt_news_info = "";
   let gpt_news_analysis_prev_input = "";
 
-  let processing = false;
-  let linksInfoOrNews = "info";
+  let processingCount = 0;
+  let processingValue = "";
+  const processingTexts = ["Processing", "Processing.", "Processing..", "Processing..."];
+  let processingTextInterval = null;
 
   function resetPrevInputValues() {
     info_key_value_prev_input = "";
@@ -62,24 +66,42 @@
     }
     return userInput;
   }
+  async function startProcessing() {
+    if (processingCount == 0) {
+      let processingTextIndex = 1;
+      processingTextInterval = setInterval(() => {
+        processingValue = processingTexts[processingTextIndex];
+        processingTextIndex = (processingTextIndex + 1) % processingTexts.length;
+      }, 500);
+      processingValue = processingTexts[0];
+    }
+    processingCount += 1;
+  }
+  async function stopProcessing() {
+    processingCount -= 1;
+    if (processingCount == 0) {
+      clearInterval(processingTextInterval);
+      processingValue = "";
+    }
+  }
   async function processInputIfSet() {
-    processing = true;
+    startProcessing();
     try {
       if (getUpperCaseInputForAction()) {
         await Promise.all([createStaticInfoLinks(), createSaticInfoGraphs(), fetchInfoData(), gptAnalysis()]);
       }
     } finally {
-      processing = false;
+      stopProcessing();
     }
   }
   async function deleteTodaysCacheInput() {
-    processing = true;
+    startProcessing();
     try {
       if (getUpperCaseInputForAction()) {
         await deleteTodaysCache()
       }
     } finally {
-      processing = false;
+      stopProcessing();
     }
   }
   async function createStaticInfoLinks() {
@@ -246,8 +268,8 @@
 <input type="password" bind:value={password} placeholder="Password" on:keydown={handleKeyDown} />
 <button on:click={processInputIfSet}>Fetch Data</button>
 <button on:click={deleteTodaysCacheInput}>Delete todays cache</button>
-{#if processing}
-  <span>Processing...</span>
+{#if processingCount > 0}
+  <span class="processingtext">({processingCount}) {processingValue}</span>
 {/if}
 {#if info_links}
   <div class="infos" style="overflow: hidden;">
@@ -313,6 +335,10 @@
 {/if}
 
 <style>
+  .processingtext {
+    font-style: italic;
+    color: black;
+  }
   .infos table thead td {
     font-weight: bold;
     background-color: lightblue;
