@@ -59,10 +59,18 @@
   {:else}
   <div class="row auth-status-banner">
     <div class="col-md-6 col-sm-12 status">
-      <button class="btn btn-light" on:click={logout}>Logout</button>
-      <span>Logged in as '{userEmail}'</span>
+      <div class="d-flex flex-row flex-nowrap">
+        <div class="col-auto">
+          <button class="btn btn-light" on:click={logout}>Logout</button>
+        </div>
+        <div class="col-auto logged-in-as">
+          Logged in as '{userEmail}'
+        </div>
+      </div>
     </div>
-    <div class="col-md-6 col-sm-12 cacheinfo"><i>(All data on this page is cached on same calendar day)</i></div>
+    <div class="col-md-6 col-sm-12 cacheinfo">
+      (All data on this page is cached on same calendar day)
+    </div>
   </div>
 
   <style>
@@ -79,9 +87,15 @@
       font-size: 0.9em;
       flex: 1;
     }
+    .auth-status-banner .logged-in-as {
+      overflow: hidden;
+      white-space: nowrap;
+      max-width: 100%;
+    }
     .auth-status-banner div.cacheinfo {
       font-size: 0.8em;
       text-align: right;
+      font-style: italic;
     }
   </style>
   <App />
