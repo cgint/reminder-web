@@ -50,33 +50,35 @@
     }
 </script>
 
-<div>
-    {#if !isAuthenticated}
-        <div id="buttonDiv"></div>
-    {:else}
-      <div class="auth-status-banner">
-        <div class="status">
-          <button on:click={logout}>Logout</button>
-          <span>Logged in as '{userEmail}'</span>
-        </div>
-        <div class="cacheinfo"><i>(All data on this page is cached on same calendar day)</i></div>
+{#if !isAuthenticated}
+  <div class="row">
+    <div id="buttonDiv"></div>
+  </div>
+  {:else}
+  <div class="row">
+    <div class="auth-status-banner">
+      <div class="status">
+        <button on:click={logout}>Logout</button>
+        <span>Logged in as '{userEmail}'</span>
       </div>
-      <style>
-        .auth-status-banner {
-          display: flex;
-          align-items: center;
-          background-color: gray;
-          color: lightgray;
-          padding: 10px;
-          margin: 10px 0;
-        }
-        .auth-status-banner button {
-          margin-right: 10px;
-        }
-        .auth-status-banner div.status {
-          flex: 1;
-        }
-      </style>
-      <App />
-    {/if}
-</div>
+      <div class="cacheinfo"><i>(All data on this page is cached on same calendar day)</i></div>
+    </div>
+  </div>
+  <style>
+    .auth-status-banner {
+      display: flex;
+      align-items: center;
+      background-color: gray;
+      color: lightgray;
+      /* padding: 10px;
+      margin: 10px 0; */
+    }
+    .auth-status-banner button {
+      margin-right: 10px;
+    }
+    .auth-status-banner div.status {
+      flex: 1;
+    }
+  </style>
+  <App />
+{/if}

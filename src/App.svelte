@@ -415,95 +415,93 @@
   <span class="processingtext">({processingCount}) {processingValue}</span>
 {/if}
 {#if info_links}
-  <div class="infos" style="overflow: hidden;">
-    <div class="row">
-      <div class="col-12">
-        <h3>Infos{infos_ticker_name}</h3>
+  <div class="row">
+    <div class="col-12">
+      <h3>Infos{infos_ticker_name}</h3>
+    </div>
+  </div>
+  <div class="row contentrow infos">
+    <div class="col-md-3 col-sm-12">
+      <div class="row">
+        <div class="col-12 columnheader textonly">
+          Numbers
+        </div>
+      </div>
+      <div class="row infos">
+        <div class="col-12 columncontent textcontent">
+          {#if Object.entries(info_key_value_pairs).length}
+          <table class="info_key_value_table">
+            <tbody>
+              {#each Object.entries(info_key_value_pairs) as [key, value]}
+                <tr>
+                  <td>
+                    <div class="info_key_value">
+                      <div class="info_key">{key}</div>
+                      <div class="info_value">{value}</div>
+                    </div>
+                  </td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        {/if}
+        </div>
+      </div>
+
+    </div>
+    <div class="col-md-2 col-sm-12">
+      <div class="row">
+        <div class="col-12 columnheader textonly">
+          Graphs
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12 columncontent">
+          <div class="graphs_wrapper">
+            {@html info_graphs}
+          </div>
+        </div>
       </div>
     </div>
-    <div class="row contentrow">
-      <div class="col-md-3 col-sm-12">
-        <div class="row">
-          <div class="col-12 columnheader textonly">
-            Numbers
-          </div>
+
+    <div class="col-md-7 col-sm-12">
+      <div class="row">
+        <div class="col-12 columnheader link-options">
+            <div on:click={activateLinksAndGptInfo} class:active={linksInfoOrNews === 'info'}>Links/GPT-Data-Analysis</div>
+            <div on:click={activateNewsAndGptNews} class:active={linksInfoOrNews === 'news'}>News/GPT-News-Analysis </div>
         </div>
-        <div class="row">
-          <div class="col-12 columncontent textcontent">
-            {#if Object.entries(info_key_value_pairs).length}
-            <table class="info_key_value_table">
-              <tbody>
-                {#each Object.entries(info_key_value_pairs) as [key, value]}
-                  <tr>
-                    <td>
-                      <div class="info_key_value">
-                        <div class="info_key">{key}</div>
-                        <div class="info_value">{value}</div>
-                      </div>
-                    </td>
-                  </tr>
-                {/each}
-              </tbody>
-            </table>
+      </div>
+      <div class="row">
+        <div class="col-12 columncontent textcontent">
+          {#if linksInfoOrNews == "info"}
+          <strong>Links:</strong><br/>
+          <div class="contentindent">
+            {@html info_links}
+          </div>
+          <br/><br/>
+          <strong>GPT-Info-Analysis{gpt_info_info}:</strong><br/>
+          <div class="contentindent">
+            <i>{@html gpt_info_analysis}</i>
+          </div>
           {/if}
+          {#if linksInfoOrNews == "news"}
+          <strong>News:</strong><br/>
+          <div class="contentindent">
+            {#each news_links_list as news_link}
+              <a href="{news_link['link']}" target="_blank">{news_link['title']}</a>
+              <span class="newsdate">({new Date(news_link['providerPublishTime'] * 1000).toISOString().slice(0, 10)})</span>
+              <br/>
+            {/each}
           </div>
+          <br/><br/>
+          <strong>GPT-News-Analysis{gpt_news_info}:</strong><br/>
+          <div class="contentindent">
+              <i>{@html gpt_news_analysis}</i>
+          </div>
+          {/if}
         </div>
-
       </div>
-      <div class="col-md-2 col-sm-12">
-        <div class="row">
-          <div class="col-12 columnheader textonly">
-            Graphs
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-12 columncontent">
-            <div class="graphs_wrapper">
-              {@html info_graphs}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-7 col-sm-12">
-        <div class="row">
-          <div class="col-12 columnheader link-options">
-              <div on:click={activateLinksAndGptInfo} class:active={linksInfoOrNews === 'info'}>Links/GPT-Data-Analysis</div>
-              <div on:click={activateNewsAndGptNews} class:active={linksInfoOrNews === 'news'}>News/GPT-News-Analysis </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-12 columncontent textcontent">
-            {#if linksInfoOrNews == "info"}
-            <strong>Links:</strong><br/>
-            <div class="contentindent">
-              {@html info_links}
-            </div>
-            <br/><br/>
-            <strong>GPT-Info-Analysis{gpt_info_info}:</strong><br/>
-            <div class="contentindent">
-              <i>{@html gpt_info_analysis}</i>
-            </div>
-            {/if}
-            {#if linksInfoOrNews == "news"}
-            <strong>News:</strong><br/>
-            <div class="contentindent">
-              {#each news_links_list as news_link}
-                <a href="{news_link['link']}" target="_blank">{news_link['title']}</a>
-                <span class="newsdate">({new Date(news_link['providerPublishTime'] * 1000).toISOString().slice(0, 10)})</span>
-                <br/>
-              {/each}
-            </div>
-            <br/><br/>
-            <strong>GPT-News-Analysis{gpt_news_info}:</strong><br/>
-            <div class="contentindent">
-                <i>{@html gpt_news_analysis}</i>
-            </div>
-            {/if}
-          </div>
-        </div>
-        <!-- Content for the third column -->
-      </div>
+      <!-- Content for the third column -->
     </div>
   </div>
 {/if}
@@ -513,7 +511,7 @@
     font-style: italic;
     color: black;
   }
-  .infos .contentrow {
+  .infos.contentrow {
     background-color: lightgray;
   }
   .infos .graphs_wrapper {
