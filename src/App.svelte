@@ -406,6 +406,11 @@
           <button on:click={deleteTodaysCacheInput} class="btn btn-warning">Del stock cache today</button>
         </div>
       {/if}
+      <div class="col-auto processingtext">
+        {#if processingValue != ""}
+          ({processingCount}) {processingValue}
+        {/if}
+      </div>
     </div>
   </div>
 </div>
@@ -417,6 +422,11 @@
       </div>
       <div class="col-auto">
         <button on:click={processInputIfSet} class="btn btn-primary">Fetch Data</button>
+      </div>
+      <div class="col-auto processingtext">
+        {#if processingValue != ""}
+          ({processingCount}) {processingValue}
+        {/if}
       </div>
     </div>
   </div>
@@ -435,9 +445,6 @@
     </div>
   </div>
 </div>
-{#if processingValue != ""}
-  <span class="processingtext">({processingCount}) {processingValue}</span>
-{/if}
 {#if info_links}
   <div class="row">
     <div class="col-12">
@@ -538,6 +545,8 @@
     width: 5em;
   }
   .processingtext {
+    padding-left: 2px;
+    padding-top: 5px;
     font-style: italic;
     color: black;
   }
