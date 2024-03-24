@@ -14,29 +14,43 @@
   let gpt_info_info = "";
   let gpt_info_analysis = "";
   let gpt_info_prev_input = "";
+  let gpt_info_processing = false;
   
   let info_key_value_pairs = {};
   let info_key_value_prev_input = "";
+  let info_key_value_processing = false;
   
   let linksInfoOrNews = "info";
   
   let news_links_list = [];
   let news_links_prev_input = "";
+  let news_links_processing = false;
   
   let gpt_news_analysis = "";
   let gpt_news_info = "";
   let gpt_news_analysis_prev_input = "";
+  let gpt_news_analysis_processing = false;
 
   let processingCount = 0;
   let processingValue = "";
   const processingTexts = ["Processing", "Processing.", "Processing..", "Processing..."];
+  let processingTextInitialSetTime = 100;
+  let processingTextInitialTimeout = null;
+  let processingTextIntervalTime = 500;
   let processingTextInterval = null;
+
+  let delete_todays_cache_processing = false;
 
   function resetPrevInputValues() {
     info_key_value_prev_input = "";
     gpt_info_prev_input = "";
     gpt_news_analysis_prev_input = "";
     news_links_prev_input = "";
+    info_key_value_processing = false;
+    gpt_info_processing = false;
+    gpt_news_analysis_processing = false;
+    news_links_processing = false;
+    delete_todays_cache_processing = false;
   }
 
   onMount(() => {
@@ -68,18 +82,22 @@
   }
   async function startProcessing() {
     if (processingCount == 0) {
+      processingTextInitialTimeout = setTimeout(() => {
+        processingValue = processingTexts[0];
+      }, processingTextInitialSetTime);
       let processingTextIndex = 1;
       processingTextInterval = setInterval(() => {
         processingValue = processingTexts[processingTextIndex];
         processingTextIndex = (processingTextIndex + 1) % processingTexts.length;
-      }, 500);
-      processingValue = processingTexts[0];
+      }, processingTextIntervalTime);
     }
     processingCount += 1;
   }
   async function stopProcessing() {
     processingCount -= 1;
     if (processingCount == 0) {
+      processingValue = "";
+      clearTimeout(processingTextInitialTimeout);
       clearInterval(processingTextInterval);
       processingValue = "";
     }
@@ -131,6 +149,10 @@
     info_graphs += `<a href="${history_graph_400m_url}" target="_blank"><img src="${history_graph_400m_url}" width="324px"/></a>`;
   }
   async function fetchInfoData() {
+    if (info_key_value_processing) {
+      return;
+    }
+    info_key_value_processing = true;
     try {
       if (userInput != info_key_value_prev_input) {
         infos_ticker_name = "";
@@ -146,10 +168,13 @@
       }).catch(error => {
         console.error("Error fetching data:", error);
         info_key_value_pairs = {'Error:': "Error fetching data: " + error};
+      }).finally(() => {
+        info_key_value_processing = false;
       });
     } catch (error) {
+      info_key_value_processing = false;
       console.error("Error fetching data:", error);
-    }
+    } 
   }
   async function gptAnalysis() {
     if (linksInfoOrNews == "info") {
@@ -160,6 +185,10 @@
     }
   }
   async function load_info_gpt_analysis() {
+    if (gpt_info_processing) {
+      return;
+    }
+    gpt_info_processing = true;
     try {
       if (userInput != gpt_info_prev_input) {
         gpt_info_info = "";
@@ -174,12 +203,19 @@
       }).catch(error => {
         console.error("Error fetching data:", error);
         gpt_info_analysis = "Error fetching data: " + error;
+      }).finally(() => {
+        gpt_info_processing = false;
       });
     } catch (error) {
+      gpt_info_processing = false;
       console.error("Error fetching gpt info analysis:", error);
     }
   }
   async function load_news_links() {
+    if (news_links_processing) {
+      return;
+    }
+    news_links_processing = true;
     try {
       if (userInput != news_links_prev_input) {
         news_links_list = [];
@@ -192,12 +228,19 @@
       }).catch(error => {
         console.error("Error fetching data:", error);
         news_links_list = [];
+      }).finally(() => {
+        news_links_processing = false;
       });
     } catch (error) {
-      console.error("Error fetching gpt news analysis:", error);
+      news_links_processing = false;
+      console.error("Error fetching news links:", error);
     }
   }
   async function load_news_gpt_analysis() {
+    if (gpt_news_analysis_processing) {
+      return;
+    }
+    gpt_news_analysis_processing = true;
     try {
       if (userInput != gpt_news_analysis_prev_input) {
         gpt_news_info = "";
@@ -212,12 +255,19 @@
       }).catch(error => {
         console.error("Error fetching data:", error);
         gpt_news_analysis = "Error fetching data: " + error;
+      }).finally(() => {
+        gpt_news_analysis_processing = false;
       });
     } catch (error) {
+      gpt_news_analysis_processing = false;
       console.error("Error fetching gpt news analysis:", error);
     }
   }
   async function deleteTodaysCache() {
+    if (delete_todays_cache_processing) {
+      return;
+    }
+    delete_todays_cache_processing = true;
     try {
       await axios.delete(
         `${api_url}/cache/${userInput}/today`, { headers: { 'password': password } }
@@ -226,8 +276,11 @@
         console.log("response:", response);
       }).catch(error => {
         console.error("Error deleting cache:", error);
+      }).finally(() => {
+        delete_todays_cache_processing = false;
       });
     } catch (error) {
+      delete_todays_cache_processing = false;
       console.error("Error deleting cache:", error);
     }
   }
