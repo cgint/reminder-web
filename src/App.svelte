@@ -181,13 +181,15 @@
   }
   async function createSaticInfoGraphs() {
     info_graphs = "";
-    info_graphs += `<a href="https://finviz.com/quote.ashx?t=${userInput}&p=m" target="_blank"><img src="https://charts2-node.finviz.com/chart.ashx?cs=m&t=${userInput}&tf=d&s=linear&ct=candle_stick"/></a>`;
+    let img_style = 'style="width: 100%; height: auto;"';
+    info_graphs += `<a href="https://finviz.com/quote.ashx?t=${userInput}&p=m" target="_blank"><img ${img_style} src="https://charts2-node.finviz.com/chart.ashx?cs=m&t=${userInput}&tf=d&s=linear&ct=candle_stick"/></a>`;
     let history_graph_12m_url = `${api_url}/image/history/${userInput}/period/12mo`;
-    info_graphs += `<a href="${history_graph_12m_url}" target="_blank"><img src="${history_graph_12m_url}" width="324px"/></a>`;
+    info_graphs += `<a href="${history_graph_12m_url}" target="_blank"><img ${img_style} src="${history_graph_12m_url}"/></a>`;
+    
     let history_graph_24m_url = `${api_url}/image/history/${userInput}/period/24mo`;
-    info_graphs += `<a href="${history_graph_24m_url}" target="_blank"><img src="${history_graph_24m_url}" width="324px"/></a>`;
+    info_graphs += `<a href="${history_graph_24m_url}" target="_blank"><img ${img_style} src="${history_graph_24m_url}"/></a>`;
     let history_graph_400m_url = `${api_url}/image/history/${userInput}/period/400mo`;
-    info_graphs += `<a href="${history_graph_400m_url}" target="_blank"><img src="${history_graph_400m_url}" width="324px"/></a>`;
+    info_graphs += `<a href="${history_graph_400m_url}" target="_blank"><img ${img_style} src="${history_graph_400m_url}"/></a>`;
   }
   async function gptDataAndAnalysis() {
     if (linksInfoOrNews == "info") {
@@ -398,22 +400,16 @@
 {#if info_links}
   <div class="infos" style="overflow: hidden;">
     <h3>Infos{infos_ticker_name}</h3>
-    <table cellpadding="0">
-      <thead>
-        <tr>
-          <td class="data">Numbers</td>
-          <td class="graphs">Graphs</td>
-          <td class="links">
-            <div class="link-options">
-              <div on:click={activateLinksAndGptInfo} class:active={linksInfoOrNews === 'info'}>Links/GPT-Data-Analysis</div>
-              <div on:click={activateNewsAndGptNews} class:active={linksInfoOrNews === 'news'}>News/GPT-News-Analysis </div>
-            </div>
-          </td>
-        </tr>
-      </thead>
-      <tr>
-        <td class="content" valign="top">
-          {#if Object.entries(info_key_value_pairs).length}
+    <div class="row">
+      <div class="col-md-3 col-sm-12">
+        <div class="row">
+          <div class="col-12 columnheader">
+            Numbers
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            {#if Object.entries(info_key_value_pairs).length}
             <table class="info_key_value_table">
               <tbody>
                 {#each Object.entries(info_key_value_pairs) as [key, value]}
@@ -429,38 +425,67 @@
               </tbody>
             </table>
           {/if}
-        </td>
-        <td class="content" valign="top">{@html info_graphs}</td>
-        <td class="content" valign="top">
-          {#if linksInfoOrNews == "info"}
-          <strong>Links:</strong><br/>
-          <div class="contentindent">
-            {@html info_links}
           </div>
-          <br/><br/>
-          <strong>GPT-Info-Analysis{gpt_info_info}:</strong><br/>
-          <div class="contentindent">
-            <i>{@html gpt_info_analysis}</i>
+        </div>
+
+      </div>
+      <div class="col-md-2 col-sm-12">
+        <div class="row">
+          <div class="col-12 columnheader">
+            Graphs
           </div>
-          {/if}
-          {#if linksInfoOrNews == "news"}
-          <strong>News:</strong><br/>
-          <div class="contentindent">
-            {#each news_links_list as news_link}
-              <a href="{news_link['link']}" target="_blank">{news_link['title']}</a>
-              <span class="newsdate">({new Date(news_link['providerPublishTime'] * 1000).toISOString().slice(0, 10)})</span>
-              <br/>
-            {/each}
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <div class="graphs_wrapper">
+              {@html info_graphs}
+            </div>
           </div>
-          <br/><br/>
-          <strong>GPT-News-Analysis{gpt_news_info}:</strong><br/>
-          <div class="contentindent">
-              <i>{@html gpt_news_analysis}</i>
+        </div>
+      </div>
+
+      <div class="col-md-7 col-sm-12">
+        <div class="row">
+          <div class="col-12 columnheader">
+            <div class="link-options">
+              <div on:click={activateLinksAndGptInfo} class:active={linksInfoOrNews === 'info'}>Links/GPT-Data-Analysis</div>
+              <div on:click={activateNewsAndGptNews} class:active={linksInfoOrNews === 'news'}>News/GPT-News-Analysis </div>
+            </div>
           </div>
-          {/if}
-        </td>
-      </tr>
-    </table>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            {#if linksInfoOrNews == "info"}
+            <strong>Links:</strong><br/>
+            <div class="contentindent">
+              {@html info_links}
+            </div>
+            <br/><br/>
+            <strong>GPT-Info-Analysis{gpt_info_info}:</strong><br/>
+            <div class="contentindent">
+              <i>{@html gpt_info_analysis}</i>
+            </div>
+            {/if}
+            {#if linksInfoOrNews == "news"}
+            <strong>News:</strong><br/>
+            <div class="contentindent">
+              {#each news_links_list as news_link}
+                <a href="{news_link['link']}" target="_blank">{news_link['title']}</a>
+                <span class="newsdate">({new Date(news_link['providerPublishTime'] * 1000).toISOString().slice(0, 10)})</span>
+                <br/>
+              {/each}
+            </div>
+            <br/><br/>
+            <strong>GPT-News-Analysis{gpt_news_info}:</strong><br/>
+            <div class="contentindent">
+                <i>{@html gpt_news_analysis}</i>
+            </div>
+            {/if}
+          </div>
+        </div>
+        <!-- Content for the third column -->
+      </div>
+    </div>
   </div>
 {/if}
 
@@ -469,32 +494,17 @@
     font-style: italic;
     color: black;
   }
-  .infos table thead td {
+  .infos .graphs_wrapper {
+    display: block;
+    width: 100%;
+  }
+  .infos .columnheader {
     font-weight: bold;
     background-color: lightblue;
     padding: 0px;
   }
-  .infos table thead td.data {
-    padding: 5px;
-  }
-  .infos table thead td.graphs {
-    padding: 5px;
-  }
-  .infos table td.content {
-    background-color: lightgray;
-    padding: 5px;
-  }
-  .infos table div.contentindent {
+  .infos div.contentindent {
     padding-left: 5px;
-  }
-  .infos td.data {
-    width: 420px;
-  }
-  .infos td.graphs {
-    width: 330px;
-  }
-  .infos td.links {
-    width: 900px;
   }
   .infos .link-options {
     display: flex;
@@ -508,27 +518,27 @@
     font-weight: bold;
     background-color: rgb(58, 185, 227);
   }
-  span.newsdate {
+  .infos span.newsdate {
     /* font-size: 8px; */
     color: gray;
     font-style: italic;
     white-space: nowrap;
   }
-  .info_key_value_table {
+  .infos .info_key_value_table {
     width: 100%;
   }
-  .info_key_value_table div.info_key_value {
+  .infos .info_key_value_table div.info_key_value {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     width: 100%;
   }
 
-  .info_key_value_table div.info_key, .info_key_value_table div.info_value {
+  .infos .info_key_value_table div.info_key, .infos .info_key_value_table div.info_value {
     flex: 1;
     white-space: nowrap;
   }
-  .info_key_value_table div.info_value {
+  .infos .info_key_value_table div.info_value {
     text-align: right;
   }
   /* ? Override for smaller screens or when content doesn't fit side by side */
