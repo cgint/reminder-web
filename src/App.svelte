@@ -389,11 +389,28 @@
     }
   });
 </script>
-
-<input type="text" bind:value={userInput} placeholder="Ticker-Symbol 'T', ..." on:keydown={handleKeyDown} />
-<input type="password" bind:value={password} placeholder="Password" on:keydown={handleKeyDown} />
-<button on:click={processInputIfSet}>Fetch Data</button>
-<button on:click={deleteTodaysCacheInput}>Delete todays cache</button>
+<div class="row">
+  <div class="col-12 d-none d-md-block">
+    <input type="text" bind:value={userInput} placeholder="Ticker-Symbol 'T', ..." on:keydown={handleKeyDown} />
+    <input type="password" bind:value={password} placeholder="Password" on:keydown={handleKeyDown} />
+    <button on:click={processInputIfSet}>Fetch Data</button>
+    <button on:click={deleteTodaysCacheInput}>Delete todays cache</button>
+  </div>
+  <div class="col-12 d-block d-md-none">
+    <div class="row">
+      <div class="col-12">
+        <input type="text" bind:value={userInput} placeholder="Ticker-Symbol 'T', ..." on:keydown={handleKeyDown} />
+        <button on:click={processInputIfSet}>Fetch Data</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <input type="password" bind:value={password} placeholder="Password" on:keydown={handleKeyDown} />
+        <button on:click={deleteTodaysCacheInput}>Delete todays cache</button>
+      </div>
+    </div>
+  </div>
+</div>
 {#if processingValue != ""}
   <span class="processingtext">({processingCount}) {processingValue}</span>
 {/if}
