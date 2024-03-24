@@ -414,12 +414,16 @@
       <tr>
         <td class="content" valign="top">
           {#if Object.entries(info_key_value_pairs).length}
-            <table>
+            <table class="info_key_value_table">
               <tbody>
                 {#each Object.entries(info_key_value_pairs) as [key, value]}
                   <tr>
-                    <td>{key}</td>
-                    <td>{value}</td>
+                    <td>
+                      <div class="info_key_value">
+                        <div class="info_key">{key}</div>
+                        <div class="info_value">{value}</div>
+                      </div>
+                    </td>
                   </tr>
                 {/each}
               </tbody>
@@ -443,7 +447,9 @@
           <strong>News:</strong><br/>
           <div class="contentindent">
             {#each news_links_list as news_link}
-              <a href="{news_link['link']}" target="_blank">{news_link['title']}</a><br/>
+              <a href="{news_link['link']}" target="_blank">{news_link['title']}</a>
+              <span class="newsdate">({new Date(news_link['providerPublishTime'] * 1000).toISOString().slice(0, 10)})</span>
+              <br/>
             {/each}
           </div>
           <br/><br/>
@@ -502,4 +508,34 @@
     font-weight: bold;
     background-color: rgb(58, 185, 227);
   }
+  span.newsdate {
+    /* font-size: 8px; */
+    color: gray;
+    font-style: italic;
+    white-space: nowrap;
+  }
+  .info_key_value_table {
+    width: 100%;
+  }
+  .info_key_value_table div.info_key_value {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .info_key_value_table div.info_key, .info_key_value_table div.info_value {
+    flex: 1;
+    white-space: nowrap;
+  }
+  .info_key_value_table div.info_value {
+    text-align: right;
+  }
+  /* ? Override for smaller screens or when content doesn't fit side by side */
+  /* @media (max-width: 768px) {
+    .info_key_value_table div.info_key, .info_key_value_table div.info_value {
+      flex-basis: 100%;
+      white-space: normal;
+    }
+  } */
 </style>
