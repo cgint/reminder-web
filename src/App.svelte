@@ -389,25 +389,27 @@
     }
   });
 </script>
-<div class="row">
-  <div class="col-12 d-none d-md-block">
-    <input type="text" bind:value={userInput} placeholder="Ticker-Symbol 'T', ..." on:keydown={handleKeyDown} />
+<div class="row input wide d-none d-md-block">
+  <div class="col-12">
+    <input type="text" bind:value={userInput} placeholder="'VZ', 'T', ..." on:keydown={handleKeyDown} />
     <input type="password" bind:value={password} placeholder="Password" on:keydown={handleKeyDown} />
     <button on:click={processInputIfSet}>Fetch Data</button>
-    <button on:click={deleteTodaysCacheInput}>Delete todays cache</button>
+    {#if userInput != ""}
+      <button on:click={deleteTodaysCacheInput}>Del stock cache today</button>
+    {/if}
   </div>
-  <div class="col-12 d-block d-md-none">
-    <div class="row">
-      <div class="col-12">
-        <input type="text" bind:value={userInput} placeholder="Ticker-Symbol 'T', ..." on:keydown={handleKeyDown} />
-        <button on:click={processInputIfSet}>Fetch Data</button>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-12">
-        <input type="password" bind:value={password} placeholder="Password" on:keydown={handleKeyDown} />
-        <button on:click={deleteTodaysCacheInput}>Delete todays cache</button>
-      </div>
+</div>
+<div class="row input narrow d-block d-md-none">
+  <div class="col-12">
+    <input type="text" bind:value={userInput} placeholder="Ticker-Symbol 'T', ..." on:keydown={handleKeyDown} />
+    <button on:click={processInputIfSet}>Fetch Data</button>
+  </div>
+  <div class="row input narrow d-block d-md-none">
+    <div class="col-12">
+      <input type="password" bind:value={password} placeholder="Password" on:keydown={handleKeyDown} />
+      {#if userInput != ""}
+        <button on:click={deleteTodaysCacheInput}>Del stock cache today</button>
+      {/if}
     </div>
   </div>
 </div>
@@ -507,6 +509,9 @@
 {/if}
 
 <style>
+  div.input input {
+    width: 5em;
+  }
   .processingtext {
     font-style: italic;
     color: black;
