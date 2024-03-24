@@ -203,7 +203,8 @@
     if (info_key_value_running || userInput == info_key_value_prev_input) {
       return;
     }
-    if(!result_cache_has_key(userInput, "info_key_value_pairs")) {
+    let main_data_key = "info_key_value_pairs";
+    if(!result_cache_has_key(userInput, main_data_key)) {
       info_key_value_running = true;
       try {
         if (userInput != info_key_value_prev_input) {
@@ -215,7 +216,7 @@
         ).then(response => {
           console.log("response:", response);
           info_key_value_prev_input = userInput;
-          result_cache_set(userInput, "info_key_value_pairs", JSON.stringify(response.data));
+          result_cache_set(userInput, main_data_key, JSON.stringify(response.data));
           result_cache_set(userInput, "infos_ticker_name", ` for ${response.data['shortName']} (${userInput})`);
         }).catch(error => {
           console.error("Error fetching data:", error);
@@ -228,8 +229,8 @@
         console.error("Error fetching data:", error);
       } 
     }
-    if (result_cache_has_key(userInput, "info_key_value_pairs")) {
-      info_key_value_pairs = JSON.parse(result_cache_get(userInput, "info_key_value_pairs"));
+    if (result_cache_has_key(userInput, main_data_key)) {
+      info_key_value_pairs = JSON.parse(result_cache_get(userInput, main_data_key));
       infos_ticker_name = result_cache_get(userInput, "infos_ticker_name");
     }
   }
@@ -237,7 +238,8 @@
     if (gpt_info_running || userInput == gpt_info_prev_input) {
       return;
     }
-    if(!result_cache_has_key(userInput, "gpt_info_analysis")) {
+    let main_data_key = "gpt_info_analysis";
+    if(!result_cache_has_key(userInput, main_data_key)) {
       gpt_info_running = true;
       try {
         if (userInput != gpt_info_prev_input) {
@@ -248,7 +250,7 @@
           `${api_url}/gpt/analysis/${userInput}/yfinance`, { headers: { 'password': password } }
         ).then(response => {
           gpt_info_prev_input = userInput;
-          result_cache_set(userInput, "gpt_info_analysis", response.data['analysis']);
+          result_cache_set(userInput, main_data_key, response.data['analysis']);
           result_cache_set(userInput, "gpt_info_info", " ("+response.data['source']+" for "+response.data['ticker']+")");
         }).catch(error => {
           console.error("Error fetching data:", error);
@@ -261,8 +263,8 @@
         console.error("Error fetching gpt info analysis:", error);
       }
     }
-    if (result_cache_has_key(userInput, "gpt_info_analysis")) {
-      gpt_info_analysis = result_cache_get(userInput, "gpt_info_analysis");
+    if (result_cache_has_key(userInput, main_data_key)) {
+      gpt_info_analysis = result_cache_get(userInput, main_data_key);
       gpt_info_info = result_cache_get(userInput, "gpt_info_info");
     }
   }
@@ -270,7 +272,8 @@
     if (news_links_running || userInput == news_links_prev_input) {
       return;
     }
-    if(!result_cache_has_key(userInput, "news_links_list")) {
+    let main_data_key = "news_links_list";
+    if(!result_cache_has_key(userInput, main_data_key)) {
       news_links_running = true;
       try {
         if (userInput != news_links_prev_input) {
@@ -280,7 +283,7 @@
           `${api_url}/data/${userInput}/news/overview`, { headers: { 'password': password } }
         ).then(response => {
           news_links_prev_input = userInput;
-          result_cache_set(userInput, "news_links_list", JSON.stringify(response.data['news']['data']));
+          result_cache_set(userInput, main_data_key, JSON.stringify(response.data['news']['data']));
         }).catch(error => {
           console.error("Error fetching data:", error);
           news_links_list = [];
@@ -292,8 +295,8 @@
         console.error("Error fetching news links:", error);
       }
     }
-    if (result_cache_has_key(userInput, "news_links_list")) {
-      news_links_list = JSON.parse(result_cache_get(userInput, "news_links_list"));
+    if (result_cache_has_key(userInput, main_data_key)) {
+      news_links_list = JSON.parse(result_cache_get(userInput, main_data_key));
     }
   }
   async function load_news_gpt_analysis() {
