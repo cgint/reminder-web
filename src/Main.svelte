@@ -72,6 +72,7 @@
       (All data on this page is cached on same calendar day)
     </div>
   </div>
+  <App />
 
   <style>
     .auth-status-banner {
@@ -98,5 +99,4 @@
       font-style: italic;
     }
   </style>
-  <App />
 {/if}
