@@ -33,7 +33,6 @@
 
   let processingCount = 0;
   let processingValue = "";
-  const processingTexts = ["Processing", "Processing.", "Processing..", "Processing..."];
   let processingTextInitialSetTime = 100;
   let processingTextInitialTimeout = null;
   let processingTextIntervalTime = 500;
@@ -124,13 +123,8 @@
   async function startProcessing() {
     if (processingCount == 0) {
       processingTextInitialTimeout = setTimeout(() => {
-        processingValue = processingTexts[0];
+        processingValue = "loading ...";
       }, processingTextInitialSetTime);
-      let processingTextIndex = 1;
-      processingTextInterval = setInterval(() => {
-        processingValue = processingTexts[processingTextIndex];
-        processingTextIndex = (processingTextIndex + 1) % processingTexts.length;
-      }, processingTextIntervalTime);
     }
     processingCount += 1;
   }
@@ -139,7 +133,6 @@
     if (processingCount == 0) {
       processingValue = "";
       clearTimeout(processingTextInitialTimeout);
-      clearInterval(processingTextInterval);
       processingValue = "";
     }
   }
@@ -408,7 +401,10 @@
       {/if}
       <div class="col-auto processingtext">
         {#if processingValue != ""}
-          ({processingCount}) {processingValue}
+          <div class="spinner-grow spinner-grow-sm" role="status">
+            <span class="visually-hidden">({processingCount}) loading ...</span>
+          </div>
+          {processingCount} loading ...
         {/if}
       </div>
     </div>
@@ -425,7 +421,10 @@
       </div>
       <div class="col-auto processingtext">
         {#if processingValue != ""}
-          ({processingCount}) {processingValue}
+          <div class="spinner-grow spinner-grow-sm" role="status">
+            <span class="visually-hidden">({processingCount}) loading ...</span>
+          </div>
+          {processingCount} loading ...
         {/if}
       </div>
     </div>
@@ -545,10 +544,9 @@
     width: 5em;
   }
   .processingtext {
-    padding-left: 2px;
-    padding-top: 5px;
-    font-style: italic;
-    color: black;
+    padding-top: 6px;
+    padding-left: 0px;
+    color: darkgray;
   }
   .infos.contentrow {
     background-color: lightgray;
