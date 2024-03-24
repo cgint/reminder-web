@@ -552,6 +552,7 @@
     background-color: lightgray;
   }
   .infos .graphs_wrapper {
+    padding-bottom: 5px;
     display: block;
     width: 100%;
   }
