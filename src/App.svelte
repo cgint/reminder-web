@@ -106,7 +106,7 @@
     startProcessing();
     try {
       if (getUpperCaseInputForAction()) {
-        await Promise.all([createStaticInfoLinks(), createSaticInfoGraphs(), fetchInfoData(), gptAnalysis()]);
+        await Promise.all([createStaticInfoLinks(), createSaticInfoGraphs(), gptDataAndAnalysis()]);
       }
     } finally {
       stopProcessing();
@@ -148,8 +148,18 @@
     let history_graph_400m_url = `${api_url}/image/history/${userInput}/period/400mo`;
     info_graphs += `<a href="${history_graph_400m_url}" target="_blank"><img src="${history_graph_400m_url}" width="324px"/></a>`;
   }
+  async function gptDataAndAnalysis() {
+    if (linksInfoOrNews == "info") {
+      await fetchInfoData();
+      await load_info_gpt_analysis();
+    } else {
+      fetchInfoData(); // do not wait
+      await load_news_links();
+      await load_news_gpt_analysis();
+    }
+  }
   async function fetchInfoData() {
-    if (info_key_value_processing) {
+    if (info_key_value_processing || userInput == info_key_value_prev_input) {
       return;
     }
     info_key_value_processing = true;
@@ -176,16 +186,8 @@
       console.error("Error fetching data:", error);
     } 
   }
-  async function gptAnalysis() {
-    if (linksInfoOrNews == "info") {
-      await load_info_gpt_analysis();
-    } else {
-      await load_news_links();
-      await load_news_gpt_analysis();
-    }
-  }
   async function load_info_gpt_analysis() {
-    if (gpt_info_processing) {
+    if (gpt_info_processing || userInput == gpt_info_prev_input) {
       return;
     }
     gpt_info_processing = true;
@@ -212,7 +214,7 @@
     }
   }
   async function load_news_links() {
-    if (news_links_processing) {
+    if (news_links_processing || userInput == news_links_prev_input) {
       return;
     }
     news_links_processing = true;
@@ -237,7 +239,7 @@
     }
   }
   async function load_news_gpt_analysis() {
-    if (gpt_news_analysis_processing) {
+    if (gpt_news_analysis_processing || userInput == gpt_news_analysis_prev_input) {
       return;
     }
     gpt_news_analysis_processing = true;
@@ -267,12 +269,12 @@
     if (delete_todays_cache_processing) {
       return;
     }
+    resetPrevInputValues()
     delete_todays_cache_processing = true;
     try {
       await axios.delete(
         `${api_url}/cache/${userInput}/today`, { headers: { 'password': password } }
       ).then(response => {
-        resetPrevInputValues()
         console.log("response:", response);
       }).catch(error => {
         console.error("Error deleting cache:", error);
@@ -296,13 +298,13 @@
       input.select();
     }
   }
-  function activateLinksGptData() {
+  function activateLinksAndGptInfo() {
     if (linksInfoOrNews != "info") {
       linksInfoOrNews = "info";
       processInputIfSet();
     }
   }
-  function activateNewsGptNews() {
+  function activateNewsAndGptNews() {
     if (linksInfoOrNews != "news") {
       linksInfoOrNews = "news";
       processInputIfSet();
@@ -334,8 +336,8 @@
           <td class="graphs">Graphs</td>
           <td class="links">
             <div class="link-options">
-              <div on:click={activateLinksGptData} class:active={linksInfoOrNews === 'info'}>Links/GPT-Data-Analysis</div>
-              <div on:click={activateNewsGptNews} class:active={linksInfoOrNews === 'news'}>News/GPT-News-Analysis </div>
+              <div on:click={activateLinksAndGptInfo} class:active={linksInfoOrNews === 'info'}>Links/GPT-Data-Analysis</div>
+              <div on:click={activateNewsAndGptNews} class:active={linksInfoOrNews === 'news'}>News/GPT-News-Analysis </div>
             </div>
           </td>
         </tr>
