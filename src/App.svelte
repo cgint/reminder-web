@@ -321,7 +321,7 @@
 <input type="password" bind:value={password} placeholder="Password" on:keydown={handleKeyDown} />
 <button on:click={processInputIfSet}>Fetch Data</button>
 <button on:click={deleteTodaysCacheInput}>Delete todays cache</button>
-{#if processingCount > 0}
+{#if processingValue != ""}
   <span class="processingtext">({processingCount}) {processingValue}</span>
 {/if}
 {#if info_links}
