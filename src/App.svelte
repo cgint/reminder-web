@@ -412,7 +412,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-12 columncontent">
+          <div class="col-12 columncontent textcontent">
             {#if Object.entries(info_key_value_pairs).length}
             <table class="info_key_value_table">
               <tbody>
@@ -456,7 +456,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-12 columncontent">
+          <div class="col-12 columncontent textcontent">
             {#if linksInfoOrNews == "info"}
             <strong>Links:</strong><br/>
             <div class="contentindent">
@@ -510,8 +510,9 @@
     font-weight: bold;
     background-color: lightblue;
   }
-  .infos .columncontent {
+  .infos .columncontent.textcontent {
     padding-left: 15px;
+    padding-right: 15px;
   }
   .infos div.contentindent {
     padding-left: 5px;
