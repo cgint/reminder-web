@@ -6,21 +6,37 @@
   
   let userInput = "";
   let password = "";
+  
   let infos_ticker_name ="";
   let info_links = "";
   let info_graphs = "";
-  let gpt_info_analysis = "";
+  
   let gpt_info_info = "";
+  let gpt_info_analysis = "";
+  let gpt_info_prev_input = "";
+  
   let info_key_value_pairs = {};
+  let info_key_value_prev_input = "";
+  
   let news_links_list = [];
+  let news_links_prev_input = "";
+  
   let gpt_news_analysis = "";
   let gpt_news_info = "";
+  let gpt_news_analysis_prev_input = "";
 
   let processing = false;
   let linksInfoOrNews = "info";
 
+  function resetPrevInputValues() {
+    info_key_value_prev_input = "";
+    gpt_info_prev_input = "";
+    gpt_news_analysis_prev_input = "";
+    news_links_prev_input = "";
+  }
+
   onMount(() => {
-    fetchUserFieldsFromStorage();
+    fetchAndPutToInputUserFieldsFromStorage();
     const urlParams = new URLSearchParams(window.location.search);
     const ticker = urlParams.get("ticker");
     if (ticker) {
@@ -34,24 +50,23 @@
     localStorage.setItem('userInput', userInput);
     localStorage.setItem('password', password);
   }
-  function fetchUserFieldsFromStorage() {
+  function fetchAndPutToInputUserFieldsFromStorage() {
     userInput = localStorage.getItem('userInput') || "";
     password = localStorage.getItem('password') || "";
   }
 
   function getUpperCaseInputForAction() {
     if (userInput) {
-      userInput = userInput.toUpperCase();
+      userInput = userInput.toUpperCase().trim();
       storeUserFieldsInStorage(userInput, password);
     }
     return userInput;
   }
-
   async function processInputIfSet() {
     processing = true;
     try {
       if (getUpperCaseInputForAction()) {
-        await Promise.all([createInfoLinks(), createInfoGraphs(), fetchData(), gptAnalysis()]);
+        await Promise.all([createStaticInfoLinks(), createSaticInfoGraphs(), fetchInfoData(), gptAnalysis()]);
       }
     } finally {
       processing = false;
@@ -67,7 +82,7 @@
       processing = false;
     }
   }
-  async function createInfoLinks() {
+  async function createStaticInfoLinks() {
     let curtimeEpoch = Math.floor(Date.now() / 1000);
     let linksToCreate = {
       FinViz: `https://finviz.com/quote.ashx?t=${userInput}&p=m`,
@@ -83,7 +98,7 @@
       info_links += `<a href="${linksToCreate[link]}" target="_blank">${link} for '${userInput}'</a><br/>`;
     }
   }
-  async function createInfoGraphs() {
+  async function createSaticInfoGraphs() {
     info_graphs = "";
     info_graphs += `<a href="https://finviz.com/quote.ashx?t=${userInput}&p=m" target="_blank"><img src="https://charts2-node.finviz.com/chart.ashx?cs=m&t=${userInput}&tf=d&s=linear&ct=candle_stick"/></a>`;
     let history_graph_12m_url = `${api_url}/image/history/${userInput}/period/12mo`;
@@ -93,14 +108,17 @@
     let history_graph_400m_url = `${api_url}/image/history/${userInput}/period/400mo`;
     info_graphs += `<a href="${history_graph_400m_url}" target="_blank"><img src="${history_graph_400m_url}" width="324px"/></a>`;
   }
-  async function fetchData() {
+  async function fetchInfoData() {
     try {
-      // infos_ticker_name = "";
-      // info_key_value_pairs = {'Loading.': 'Please wait...'};
+      if (userInput != info_key_value_prev_input) {
+        infos_ticker_name = "";
+        info_key_value_pairs = {'Loading.': 'Please wait...'};
+      }
       await axios.get(
         `${api_url}/data/${userInput}`, { headers: { 'password': password } }
       ).then(response => {
         console.log("response:", response);
+        info_key_value_prev_input = userInput;
         info_key_value_pairs = response.data;
         infos_ticker_name = ` for ${response.data['shortName']} (${userInput})`;
       }).catch(error => {
@@ -121,11 +139,14 @@
   }
   async function load_info_gpt_analysis() {
     try {
-      // gpt_info_info = ""
-      // gpt_info_analysis = 'Analysing. Please wait...';
+      if (userInput != gpt_info_prev_input) {
+        gpt_info_info = "";
+        gpt_info_analysis = 'Analysing. Please wait...';
+      }
       await axios.get(
         `${api_url}/gpt/analysis/${userInput}/yfinance`, { headers: { 'password': password } }
       ).then(response => {
+        gpt_info_prev_input = userInput;
         gpt_info_analysis = response.data['analysis'];
         gpt_info_info = " ("+response.data['source']+" for "+response.data['ticker']+")";
       }).catch(error => {
@@ -138,10 +159,13 @@
   }
   async function load_news_links() {
     try {
-      // news_links_list = [];
+      if (userInput != news_links_prev_input) {
+        news_links_list = [];
+      }
       await axios.get(
         `${api_url}/data/${userInput}/news/overview`, { headers: { 'password': password } }
       ).then(response => {
+        news_links_prev_input = userInput;
         news_links_list = response.data['news']['data'];
       }).catch(error => {
         console.error("Error fetching data:", error);
@@ -153,11 +177,14 @@
   }
   async function load_news_gpt_analysis() {
     try {
-      // gpt_news_info = ""
-      // gpt_news_analysis = 'Analysing. Please wait...';
+      if (userInput != gpt_news_analysis_prev_input) {
+        gpt_news_info = "";
+        gpt_news_analysis = 'Analysing. Please wait...';
+      }
       await axios.get(
         `${api_url}/gpt/analysis/${userInput}/news`, { headers: { 'password': password } }
       ).then(response => {
+        gpt_news_analysis_prev_input = userInput;
         gpt_news_analysis = response.data['analysis'];
         gpt_news_info = " ("+response.data['source']+" for "+response.data['ticker']+")";
       }).catch(error => {
@@ -173,6 +200,7 @@
       await axios.delete(
         `${api_url}/cache/${userInput}/today`, { headers: { 'password': password } }
       ).then(response => {
+        resetPrevInputValues()
         console.log("response:", response);
       }).catch(error => {
         console.error("Error deleting cache:", error);
