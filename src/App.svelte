@@ -308,7 +308,7 @@
 <InputFields  on:processInputIfSetWithFieldsUpdate={processInputIfSetWithFieldsUpdate} 
               on:deleteTodaysCacheInputWithFieldsUpdate={deleteTodaysCacheInputWithFieldsUpdate}
               on:formInputChange={updateFieldsFromEvent}
-              userInput={userInput} password={password} processingValue={processingValue} processingCount={processingCount} />
+              processingValue={processingValue} processingCount={processingCount} />
 {#if info_links}
   <div class="row">
     <div class="col-12">
@@ -362,8 +362,8 @@
     <div class="col-lg-7 col-md-12">
       <div class="row">
         <div class="col-12 columnheader link-options">
-            <div on:click={activateLinksAndGptInfo} class:active={linksInfoOrNews === 'info'}>Links/GPT-Data-Analysis</div>
-            <div on:click={activateNewsAndGptNews} class:active={linksInfoOrNews === 'news'}>News/GPT-News-Analysis </div>
+            <button on:click="{activateLinksAndGptInfo}" class:active="{linksInfoOrNews === 'info'}" style="border: none; cursor: pointer;">Links/GPT-Data-Analysis</button>
+            <button on:click="{activateNewsAndGptNews}" class:active="{linksInfoOrNews === 'news'}" style="border: none; cursor: pointer;">News/GPT-News-Analysis </button>
         </div>
       </div>
       <div class="row">
@@ -435,12 +435,13 @@
   .infos .link-options {
     display: flex;
   }
-  .infos .link-options div {
+  .infos .link-options button {
+    background-color: lightblue;
     cursor: pointer;
     padding-left: 5px;
     flex: 1;
   }
-  .infos .link-options div.active {
+  .infos .link-options .active {
     font-weight: bold;
     background-color: rgb(58, 185, 227);
   }
