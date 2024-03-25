@@ -186,12 +186,9 @@
   }
   async function gptDataAndAnalysis() {
     if (linksInfoOrNews == "info") {
-      await fetchInfoData();
-      await load_info_gpt_analysis();
+      await Promise.all([fetchInfoData(), load_info_gpt_analysis()]);
     } else {
-      fetchInfoData(); // do not wait
-      await load_news_links();
-      await load_news_gpt_analysis();
+      await Promise.all([fetchInfoData(), load_news_links(), load_news_gpt_analysis()]);
     }
   }
   async function fetchInfoData() {
