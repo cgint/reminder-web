@@ -1,5 +1,6 @@
 <script>
   import InputFields from "./app-components/InputFields.svelte";
+  import { result_cache_has_key, result_cache_get, result_cache_set, result_cache_delete_today_stock } from "./app-components/result_cache.js";
   import axios from "axios";
 
   let api_url = import.meta.env.VITE_BACKEND_URL;
@@ -50,45 +51,6 @@
     gpt_news_analysis_running = false;
     news_links_running = false;
     delete_todays_cache_running = false;
-  }
-
-  function result_cache_today_key_base() {
-    let today = new Date().toISOString().split('T')[0];
-    return `result_cache-${today}`;
-  }
-  function result_cache_today_key_for_stock(stock) {
-    return `${result_cache_today_key_base()}-${stock}`;
-  }
-  function result_cache_key_today(ticker, section) {
-    return `${result_cache_today_key_for_stock(ticker)}-${section}`;
-  }
-  function result_cache_set(ticker, section, value) {
-    localStorage.setItem(result_cache_key_today(ticker, section), value);
-  }
-  function result_cache_has_key(ticker, section) {
-    return localStorage.getItem(result_cache_key_today(ticker, section)) != null;
-  }
-  function result_cache_get(ticker, section) {
-    return localStorage.getItem(result_cache_key_today(ticker, section));
-  }
-  function result_cache_find_with_prefix(prefix) {
-      console.log("result_cache_find_with_prefix - prefix:", prefix);
-      let keys_found = [];
-      console.log("result_cache_find_with_prefix - keys in localstorage:", localStorage.length);
-      for (let i = 0; i < localStorage.length; i++) {
-        let key = localStorage.key(i);
-        if (key.startsWith(prefix)) {
-          keys_found.push(key);
-        }
-      }
-      return keys_found;
-    }
-
-  function result_cache_delete_today_stock(ticker) {
-    let today_key_stock = result_cache_today_key_for_stock(ticker);
-    let keys_to_remove = result_cache_find_with_prefix(today_key_stock);
-    console.log("keys_to_remove:", keys_to_remove);
-    keys_to_remove.forEach(key => localStorage.removeItem(key));
   }
   async function startProcessing() {
     if (processingCount == 0) {
