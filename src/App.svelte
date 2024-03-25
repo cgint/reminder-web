@@ -363,7 +363,7 @@
       <div class="row">
         <div class="col-12 columnheader link-options">
             <button on:click="{activateLinksAndGptInfo}" class:active="{linksInfoOrNews === 'info'}" style="border: none; cursor: pointer;">Links/GPT-Data-Analysis</button>
-            <button on:click="{activateNewsAndGptNews}" class:active="{linksInfoOrNews === 'news'}" style="border: none; cursor: pointer;">News/GPT-News-Analysis </button>
+            <button on:click="{activateNewsAndGptNews}" class:active="{linksInfoOrNews === 'news'}" style="border: none; cursor: pointer;">News/GPT-News-Analysis</button>
         </div>
       </div>
       <div class="row">
