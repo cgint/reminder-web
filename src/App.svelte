@@ -1,5 +1,9 @@
 <script>
   import InputFields from "./app-components/InputFields.svelte";
+  import InfoKeyValue from "./app-components/InfoKeyValue.svelte";
+  import ChartGraphs from "./app-components/ChartGraphs.svelte";
+  import LinkNews from "./app-components/LinkNews.svelte";
+
   import { result_cache_has_key, result_cache_get, result_cache_set, result_cache_delete_today_stock } from "./app-components/result_cache.js";
   import axios from "axios";
 
@@ -316,88 +320,12 @@
     </div>
   </div>
   <div class="row contentrow infos">
-    <div class="col-lg-3 col-md-12">
-      <div class="row">
-        <div class="col-12 columnheader textonly">
-          Numbers
-        </div>
-      </div>
-      <div class="row infos">
-        <div class="col-12 columncontent textcontent min-height-300">
-          {#if Object.entries(info_key_value_pairs).length}
-          <table class="info_key_value_table">
-            <tbody>
-              {#each Object.entries(info_key_value_pairs) as [key, value]}
-                <tr>
-                  <td>
-                    <div class="info_key_value">
-                      <div class="info_key">{key}</div>
-                      <div class="info_value">{value}</div>
-                    </div>
-                  </td>
-                </tr>
-              {/each}
-            </tbody>
-          </table>
-        {/if}
-        </div>
-      </div>
-
-    </div>
-    <div class="col-lg-2 col-md-12 middlecolumn">
-      <div class="row">
-        <div class="col-12 columnheader textonly">
-          Graphs
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-12 columncontent">
-          <div class="graphs_wrapper">
-            {@html info_graphs}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-lg-7 col-md-12">
-      <div class="row">
-        <div class="col-12 columnheader link-options">
-            <button on:click="{activateLinksAndGptInfo}" class:active="{linksInfoOrNews === 'info'}" style="border: none; cursor: pointer;">Links/GPT-Data-Analysis</button>
-            <button on:click="{activateNewsAndGptNews}" class:active="{linksInfoOrNews === 'news'}" style="border: none; cursor: pointer;">News/GPT-News-Analysis</button>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-12 columncontent textcontent">
-          {#if linksInfoOrNews == "info"}
-          <strong>Links:</strong><br/>
-          <div class="contentindent">
-            {@html info_links}
-          </div>
-          <br/><br/>
-          <strong>GPT-Info-Analysis{gpt_info_info}:</strong><br/>
-          <div class="contentindent min-height-300 gpt-result">
-            <i>{@html gpt_info_analysis}</i>
-          </div>
-          {/if}
-          {#if linksInfoOrNews == "news"}
-          <strong>News:</strong><br/>
-          <div class="contentindent">
-            {#each news_links_list as news_link}
-              <a href="{news_link['link']}" target="_blank">{news_link['title']}</a>
-              <span class="newsdate">({new Date(news_link['providerPublishTime'] * 1000).toISOString().slice(0, 10)})</span>
-              <br/>
-            {/each}
-          </div>
-          <br/><br/>
-          <strong>GPT-News-Analysis{gpt_news_info}:</strong><br/>
-          <div class="contentindent min-height-300 gpt-result">
-              <i>{@html gpt_news_analysis}</i>
-          </div>
-          {/if}
-        </div>
-      </div>
-      <!-- Content for the third column -->
-    </div>
+    <InfoKeyValue info_key_value_pairs={info_key_value_pairs} />
+    <ChartGraphs info_graphs={info_graphs} />
+    <LinkNews on:activateLinksAndGptInfo={activateLinksAndGptInfo} on:activateNewsAndGptNews={activateNewsAndGptNews}
+      linksInfoOrNews={linksInfoOrNews} info_links={info_links} gpt_info_info={gpt_info_info} gpt_info_analysis={gpt_info_analysis}
+      news_links_list={news_links_list} gpt_news_info={gpt_news_info} gpt_news_analysis={gpt_news_analysis}
+    />
   </div>
 {/if}
 
@@ -405,80 +333,4 @@
   .infos.contentrow {
     background-color: lightgray;
   }
-  .infos .graphs_wrapper {
-    padding-bottom: 5px;
-    display: block;
-    width: 100%;
-  }
-  .infos .columnheader.textonly {
-    padding-left: 15px;
-  }
-  .infos .columnheader {
-    font-weight: bold;
-    background-color: lightblue;
-  }
-  .infos .middlecolumn {
-    border-left: 1px solid white;
-    border-right: 1px solid white;
-  }
-  .infos .columncontent .min-height-300 {
-    min-height: 300px;
-  }
-  .infos .columncontent .gpt-result {
-    color: rgb(90, 90, 90);
-  }
-  .infos .columncontent.textcontent {
-    padding-left: 15px;
-    padding-right: 15px;
-    padding-bottom: 25px;
-  }
-  .infos div.contentindent {
-    padding-left: 5px;
-  }
-  .infos .link-options {
-    display: flex;
-  }
-  .infos .link-options button {
-    background-color: lightblue;
-    cursor: pointer;
-    padding-left: 5px;
-    flex: 1;
-  }
-  .infos .link-options .active {
-    font-weight: bold;
-    background-color: rgb(58, 185, 227);
-  }
-  .infos span.newsdate {
-    color: rgb(90, 90, 90);
-    font-style: italic;
-    white-space: nowrap;
-  }
-  .infos .info_key_value_table {
-    width: 100%;
-  }
-  .infos .info_key_value_table div.info_key_value {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    width: 100%;
-  }
-
-  .infos .info_key_value_table div.info_key, .infos .info_key_value_table div.info_value {
-    flex: 1;
-    white-space: nowrap;
-  }
-  .infos .info_key_value_table div.info_key::first-letter {
-    text-transform: uppercase;
-  }
-  .infos .info_key_value_table div.info_value {
-    color: rgb(90, 90, 90);
-    text-align: right;
-  }
-  /* ? Override for smaller screens or when content doesn't fit side by side */
-  /* @media (max-width: 768px) {
-    .info_key_value_table div.info_key, .info_key_value_table div.info_value {
-      flex-basis: 100%;
-      white-space: normal;
-    }
-  } */
 </style>
