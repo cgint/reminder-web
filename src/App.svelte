@@ -1,4 +1,5 @@
 <script>
+  import InputFields from "./app-components/InputFields.svelte";
   import { onMount } from "svelte";
   import axios from "axios";
 
@@ -135,6 +136,7 @@
     }
   }
   async function processInputIfSet() {
+    console.log("processInputIfSet start with input: ", userInput);
     startProcessing();
     try {
       if (getUpperCaseInputForAction()) {
@@ -345,11 +347,6 @@
       console.error("Error deleting cache:", error);
     }
   }
-  function handleKeyDown(event) {
-    if (event.key === "Enter") {
-      processInputIfSet();
-    }
-  }
   function focus_on_ticker_input() {
     const input = document.querySelector("input");
     if (input) {
@@ -369,6 +366,11 @@
       processInputIfSet();
     }
   }
+  function processInputIfSetWithInput(event) {
+    userInput = event.detail.userInput;
+    password = event.detail.password;
+    processInputIfSet();
+  }
   // Add event listener to set focus on input when 'f' key is pressed
   window.addEventListener("keydown", (event) => {
     if (event.shiftKey && event.key === "/") {
@@ -377,68 +379,8 @@
     }
   });
 </script>
-<div class="row inputfields wide d-none d-md-block">
-  <div class="col">
-    <div class="row">
-      <div class="col-auto">
-        <input type="text" bind:value={userInput} placeholder="'VZ', 'T', ..." on:keydown={handleKeyDown} class="form-control" />
-      </div>
-      <div class="col-auto">
-        <input type="password" bind:value={password} placeholder="Password" on:keydown={handleKeyDown} class="form-control" />
-      </div>
-      <div class="col-auto">
-        <button on:click={processInputIfSet} class="btn btn-primary">Fetch Data</button>
-      </div>
-      {#if userInput != ""}
-        <div class="col-auto">
-          <button on:click={deleteTodaysCacheInput} class="btn btn-warning">Del stock cache today</button>
-        </div>
-      {/if}
-      <div class="col-auto processingtext">
-        {#if processingValue != ""}
-          <div class="spinner-grow spinner-grow-sm" role="status">
-            <span class="visually-hidden">({processingCount}) loading ...</span>
-          </div>
-          {processingCount} loading ...
-        {/if}
-      </div>
-    </div>
-  </div>
-</div>
-<div class="row inputfields narrow d-block d-md-none">
-  <div class="col-12">
-    <div class="row">
-      <div class="col-auto">
-        <input type="text" bind:value={userInput} placeholder="Ticker-Symbol 'T', ..." on:keydown={handleKeyDown} class="form-control" />
-      </div>
-      <div class="col-auto">
-        <button on:click={processInputIfSet} class="btn btn-primary">Fetch Data</button>
-      </div>
-      <div class="col-auto processingtext">
-        {#if processingValue != ""}
-          <div class="spinner-grow spinner-grow-sm" role="status">
-            <span class="visually-hidden">({processingCount}) loading ...</span>
-          </div>
-          {processingCount} loading ...
-        {/if}
-      </div>
-    </div>
-  </div>
-  <div class="row inputfields narrow d-block d-md-none">
-    <div class="col-12">
-      <div class="row">
-        <div class="col-auto">
-          <input type="password" bind:value={password} placeholder="Password" on:keydown={handleKeyDown} class="form-control" />
-        </div>
-        {#if userInput != ""}
-        <div class="col-auto">
-          <button on:click={deleteTodaysCacheInput} class="btn btn-warning">Del stock cache today</button>
-        </div>
-        {/if}
-      </div>
-    </div>
-  </div>
-</div>
+<InputFields on:processInputIfSetWithInput={processInputIfSetWithInput} on:deleteTodaysCacheInput={deleteTodaysCacheInput}
+             userInput={userInput} password={password} processingValue={processingValue} processingCount={processingCount} />
 {#if info_links}
   <div class="row">
     <div class="col-12">
@@ -532,17 +474,6 @@
 {/if}
 
 <style>
-  div.inputfields {
-    margin-top: 5px;
-  }
-  div.inputfields input {
-    width: 5em;
-  }
-  .processingtext {
-    padding-top: 6px;
-    padding-left: 0px;
-    color: darkgray;
-  }
   .infos.contentrow {
     background-color: lightgray;
   }
