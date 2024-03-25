@@ -16,6 +16,13 @@
 </div>
 
 <style>
+    .columnheader {
+        font-weight: bold;
+        background-color: lightblue;
+    }
+    .columnheader.textonly {
+        padding-left: 15px;
+    }
     .graphs_wrapper {
         padding-bottom: 5px;
         display: block;

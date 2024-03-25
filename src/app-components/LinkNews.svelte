@@ -73,8 +73,17 @@
 </div>
 
 <style>
+    .columnheader {
+        font-weight: bold;
+        background-color: lightblue;
+    }
     .columncontent .gpt-result {
         color: rgb(90, 90, 90);
+    }
+    .columncontent.textcontent {
+        padding-left: 15px;
+        padding-right: 15px;
+        padding-bottom: 25px;
     }
     .contentindent {
         padding-left: 5px;
