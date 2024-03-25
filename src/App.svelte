@@ -455,7 +455,7 @@
         </div>
       </div>
       <div class="row infos">
-        <div class="col-12 columncontent textcontent">
+        <div class="col-12 columncontent textcontent min-height-300">
           {#if Object.entries(info_key_value_pairs).length}
           <table class="info_key_value_table">
             <tbody>
@@ -476,7 +476,7 @@
       </div>
 
     </div>
-    <div class="col-lg-2 col-md-12">
+    <div class="col-lg-2 col-md-12 middlecolumn">
       <div class="row">
         <div class="col-12 columnheader textonly">
           Graphs
@@ -507,7 +507,7 @@
           </div>
           <br/><br/>
           <strong>GPT-Info-Analysis{gpt_info_info}:</strong><br/>
-          <div class="contentindent">
+          <div class="contentindent min-height-300">
             <i>{@html gpt_info_analysis}</i>
           </div>
           {/if}
@@ -522,7 +522,7 @@
           </div>
           <br/><br/>
           <strong>GPT-News-Analysis{gpt_news_info}:</strong><br/>
-          <div class="contentindent">
+          <div class="contentindent min-height-300">
               <i>{@html gpt_news_analysis}</i>
           </div>
           {/if}
@@ -560,9 +560,17 @@
     font-weight: bold;
     background-color: lightblue;
   }
+  .infos .middlecolumn {
+    border-left: 1px solid white;
+    border-right: 1px solid white;
+  }
+  .infos .columncontent .min-height-300 {
+    min-height: 300px;
+  }
   .infos .columncontent.textcontent {
     padding-left: 15px;
     padding-right: 15px;
+    padding-bottom: 25px;
   }
   .infos div.contentindent {
     padding-left: 5px;
@@ -599,7 +607,11 @@
     flex: 1;
     white-space: nowrap;
   }
+  .infos .info_key_value_table div.info_key::first-letter {
+    text-transform: uppercase;
+  }
   .infos .info_key_value_table div.info_value {
+    color: gray;
     text-align: right;
   }
   /* ? Override for smaller screens or when content doesn't fit side by side */
