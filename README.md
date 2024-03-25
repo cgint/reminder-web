@@ -6,5 +6,8 @@ Use a combination of `npm-watch` (rebuild to dist-directory) and `wrangler --liv
 
 ```
 Terminal1: npm run watch
-Terminal2: npm run dev
+Terminal2: npm run preview
 ```
+
+or simply use the script `preview_watch.sh` to manage both processes.
+
