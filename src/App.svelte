@@ -35,8 +35,6 @@
   let processingValue = "";
   let processingTextInitialSetTime = 100;
   let processingTextInitialTimeout = null;
-  let processingTextIntervalTime = 500;
-  let processingTextInterval = null;
 
   let delete_todays_cache_running = false;
 
