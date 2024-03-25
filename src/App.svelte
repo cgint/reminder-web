@@ -375,7 +375,7 @@
           </div>
           <br/><br/>
           <strong>GPT-Info-Analysis{gpt_info_info}:</strong><br/>
-          <div class="contentindent min-height-300">
+          <div class="contentindent min-height-300 gpt-result">
             <i>{@html gpt_info_analysis}</i>
           </div>
           {/if}
@@ -390,7 +390,7 @@
           </div>
           <br/><br/>
           <strong>GPT-News-Analysis{gpt_news_info}:</strong><br/>
-          <div class="contentindent min-height-300">
+          <div class="contentindent min-height-300 gpt-result">
               <i>{@html gpt_news_analysis}</i>
           </div>
           {/if}
@@ -424,6 +424,9 @@
   .infos .columncontent .min-height-300 {
     min-height: 300px;
   }
+  .infos .columncontent .gpt-result {
+    color: rgb(90, 90, 90);
+  }
   .infos .columncontent.textcontent {
     padding-left: 15px;
     padding-right: 15px;
@@ -446,8 +449,7 @@
     background-color: rgb(58, 185, 227);
   }
   .infos span.newsdate {
-    /* font-size: 8px; */
-    color: gray;
+    color: rgb(90, 90, 90);
     font-style: italic;
     white-space: nowrap;
   }
@@ -469,7 +471,7 @@
     text-transform: uppercase;
   }
   .infos .info_key_value_table div.info_value {
-    color: gray;
+    color: rgb(90, 90, 90);
     text-align: right;
   }
   /* ? Override for smaller screens or when content doesn't fit side by side */
