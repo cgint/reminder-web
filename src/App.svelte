@@ -448,7 +448,7 @@
     </div>
   </div>
   <div class="row contentrow infos">
-    <div class="col-md-3 col-sm-12">
+    <div class="col-lg-3 col-md-12">
       <div class="row">
         <div class="col-12 columnheader textonly">
           Numbers
@@ -476,7 +476,7 @@
       </div>
 
     </div>
-    <div class="col-md-2 col-sm-12">
+    <div class="col-lg-2 col-md-12">
       <div class="row">
         <div class="col-12 columnheader textonly">
           Graphs
@@ -491,7 +491,7 @@
       </div>
     </div>
 
-    <div class="col-md-7 col-sm-12">
+    <div class="col-lg-7 col-md-12">
       <div class="row">
         <div class="col-12 columnheader link-options">
             <div on:click={activateLinksAndGptInfo} class:active={linksInfoOrNews === 'info'}>Links/GPT-Data-Analysis</div>
