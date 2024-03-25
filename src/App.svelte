@@ -1,6 +1,5 @@
 <script>
   import InputFields from "./app-components/InputFields.svelte";
-  import { onMount } from "svelte";
   import axios from "axios";
 
   let api_url = import.meta.env.VITE_BACKEND_URL;
@@ -91,34 +90,6 @@
     console.log("keys_to_remove:", keys_to_remove);
     keys_to_remove.forEach(key => localStorage.removeItem(key));
   }
-
-  onMount(() => {
-    fetchAndPutToInputUserFieldsFromStorage();
-    const urlParams = new URLSearchParams(window.location.search);
-    const ticker = urlParams.get("ticker");
-    if (ticker) {
-      userInput = ticker;
-    }
-    processInputIfSet();
-    focus_on_ticker_input();
-  });
-
-  function storeUserFieldsInStorage(userInput, password) {
-    localStorage.setItem('userInput', userInput);
-    localStorage.setItem('password', password);
-  }
-  function fetchAndPutToInputUserFieldsFromStorage() {
-    userInput = localStorage.getItem('userInput') || "";
-    password = localStorage.getItem('password') || "";
-  }
-
-  function getUpperCaseInputForAction() {
-    if (userInput) {
-      userInput = userInput.toUpperCase().trim();
-      storeUserFieldsInStorage(userInput, password);
-    }
-    return userInput;
-  }
   async function startProcessing() {
     if (processingCount == 0) {
       processingTextInitialTimeout = setTimeout(() => {
@@ -139,7 +110,7 @@
     console.log("processInputIfSet start with input: ", userInput);
     startProcessing();
     try {
-      if (getUpperCaseInputForAction()) {
+      if (userInput) {
         await Promise.all([createStaticInfoLinks(), createSaticInfoGraphs(), gptDataAndAnalysis()]);
       }
     } finally {
@@ -149,7 +120,7 @@
   async function deleteTodaysCacheInput() {
     startProcessing();
     try {
-      if (getUpperCaseInputForAction()) {
+      if (userInput) {
         await deleteTodaysCacheForStock()
       }
     } finally {
@@ -347,13 +318,6 @@
       console.error("Error deleting cache:", error);
     }
   }
-  function focus_on_ticker_input() {
-    const input = document.querySelector("input");
-    if (input) {
-      input.focus();
-      input.select();
-    }
-  }
   function activateLinksAndGptInfo() {
     if (linksInfoOrNews != "info") {
       linksInfoOrNews = "info";
@@ -366,21 +330,23 @@
       processInputIfSet();
     }
   }
-  function processInputIfSetWithInput(event) {
-    userInput = event.detail.userInput;
-    password = event.detail.password;
+  function processInputIfSetWithFieldsUpdate(event) {
+    updateFieldsFromEvent(event);
     processInputIfSet();
   }
-  // Add event listener to set focus on input when 'f' key is pressed
-  window.addEventListener("keydown", (event) => {
-    if (event.shiftKey && event.key === "/") {
-      focus_on_ticker_input();
-      event.preventDefault();
-    }
-  });
+  function deleteTodaysCacheInputWithFieldsUpdate(event) {
+    updateFieldsFromEvent(event);
+    deleteTodaysCacheInput();
+  }
+  function updateFieldsFromEvent(event) {
+    userInput = event.detail.userInput;
+    password = event.detail.password;
+  }
 </script>
-<InputFields on:processInputIfSetWithInput={processInputIfSetWithInput} on:deleteTodaysCacheInput={deleteTodaysCacheInput}
-             userInput={userInput} password={password} processingValue={processingValue} processingCount={processingCount} />
+<InputFields  on:processInputIfSetWithFieldsUpdate={processInputIfSetWithFieldsUpdate} 
+              on:deleteTodaysCacheInputWithFieldsUpdate={deleteTodaysCacheInputWithFieldsUpdate}
+              on:formInputChange={updateFieldsFromEvent}
+              userInput={userInput} password={password} processingValue={processingValue} processingCount={processingCount} />
 {#if info_links}
   <div class="row">
     <div class="col-12">

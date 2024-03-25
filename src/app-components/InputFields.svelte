@@ -1,6 +1,9 @@
 <script>
+  import { onMount } from "svelte";
   import ProcessingText from "./ProcessingText.svelte";
-  export let userInput, password, processingValue, processingCount;
+  export let processingValue, processingCount;
+  let userInput = "";
+  let password = "";
 
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher();
@@ -11,17 +14,62 @@
     }
   }
   function processInputIfSet() {
-    dispatch("processInputIfSetWithInput", {userInput, password});
+    dispatch("processInputIfSetWithFieldsUpdate", {userInput: getUpperCaseInputForAction(), password: password});
   }
   function deleteTodaysCacheInput() {
-    dispatch("deleteTodaysCacheInput");
+    dispatch("deleteTodaysCacheInputWithFieldsUpdate", {userInput: getUpperCaseInputForAction(), password: password});
   }
+  function formInputChangeAnyField() {
+    dispatch("formInputChange", {userInput: getUpperCaseInputForAction(), password: password});
+  }
+
+  onMount(() => {
+    fetchAndPutToInputUserFieldsFromStorage();
+    const urlParams = new URLSearchParams(window.location.search);
+    const ticker = urlParams.get("ticker");
+    if (ticker) {
+      userInput = ticker;
+    }
+    processInputIfSet();
+    focus_on_ticker_input();
+  });
+
+  function storeUserFieldsInStorage(userInput, password) {
+    localStorage.setItem('userInput', userInput);
+    localStorage.setItem('password', password);
+  }
+  function fetchAndPutToInputUserFieldsFromStorage() {
+    userInput = localStorage.getItem('userInput') || "";
+    password = localStorage.getItem('password') || "";
+  }
+
+  function getUpperCaseInputForAction() {
+    if (userInput) {
+      userInput = userInput.toUpperCase().trim();
+      storeUserFieldsInStorage(userInput, password);
+    }
+    return userInput;
+  }
+  function focus_on_ticker_input() {
+    const input = document.querySelector("input");
+    if (input) {
+      input.focus();
+      input.select();
+    }
+  }
+  // Add event listener to set focus on input when 'f' key is pressed
+  window.addEventListener("keydown", (event) => {
+    if (event.shiftKey && event.key === "/") {
+      focus_on_ticker_input();
+      event.preventDefault();
+    }
+  });
 </script>
 <div class="row inputfields wide d-none d-md-block">
   <div class="col">
     <div class="row">
       <div class="col-auto">
-        <input type="text" bind:value={userInput} placeholder="'VZ', 'T', ..." on:keydown={handleKeyDown} class="form-control" />
+        <input type="text" on:change={formInputChangeAnyField} bind:value={userInput} placeholder="'VZ', 'T', ..." on:keydown={handleKeyDown} class="form-control" />
       </div>
       <div class="col-auto">
         <input type="password" bind:value={password} placeholder="Password" on:keydown={handleKeyDown} class="form-control" />
