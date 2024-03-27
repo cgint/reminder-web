@@ -9,7 +9,7 @@
 
   let api_url = import.meta.env.VITE_BACKEND_URL;
   
-  let userInput = "";
+  let userInputTicker = "";
   let password = "";
   
   let infos_ticker_name ="";
@@ -25,7 +25,7 @@
   let info_key_value_prev_input = "";
   let info_key_value_running = false;
   
-  let linksInfoOrNews = "info";
+  let activeInfoNewsChat = "info";
   
   let news_links_list = [];
   let news_links_prev_input = "";
@@ -35,6 +35,12 @@
   let gpt_news_info = "";
   let gpt_news_analysis_prev_input = "";
   let gpt_news_analysis_running = false;
+
+  let chatInput = "";
+  let chat_answering_running = false;
+  let chat_info = "";
+  let chat_stats = "";
+  let chat_answer = "";
 
   let processingCount = 0;
   let processingValue = "";
@@ -55,6 +61,7 @@
     gpt_news_analysis_running = false;
     news_links_running = false;
     delete_todays_cache_running = false;
+    chat_answering_running = false;
   }
   async function startProcessing() {
     if (processingCount == 0) {
@@ -73,11 +80,11 @@
     }
   }
   async function processInputIfSet() {
-    console.log("processInputIfSet start with input: ", userInput);
+    console.log("processInputIfSet start with input: ", userInputTicker);
     startProcessing();
     try {
-      if (userInput) {
-        await Promise.all([createStaticInfoLinks(), createSaticInfoGraphs(), gptDataAndAnalysis()]);
+      if (userInputTicker) {
+        await Promise.all([createStaticInfoLinks(), createSaticInfoGraphs(), processInfoNewsOrChat()]);
       }
     } finally {
       stopProcessing();
@@ -86,7 +93,7 @@
   async function deleteTodaysCacheInput() {
     startProcessing();
     try {
-      if (userInput) {
+      if (userInputTicker) {
         await deleteTodaysCacheForStock()
       }
     } finally {
@@ -96,57 +103,63 @@
   async function createStaticInfoLinks() {
     let curtimeEpoch = Math.floor(Date.now() / 1000);
     let linksToCreate = {
-      FinViz: `https://finviz.com/quote.ashx?t=${userInput}&p=m`,
-      "Yahoo Details": `https://finance.yahoo.com/quote/${userInput}`,
-      "Yahoo Analysis": `https://finance.yahoo.com/quote/${userInput}/analysis`,
-      "Yahoo Historic Dividends": `https://finance.yahoo.com/quote/${userInput}/history?period1=345427200&period2=${curtimeEpoch}&interval=capitalGain%7Cdiv%7Csplit&filter=div&frequency=1d&includeAdjustedClose=true`,
-      "Yahoo Lookup": `https://finance.yahoo.com/lookup?s=${userInput}`,
-      "Danelfin": `https://danelfin.com/stock/${userInput}`,
+      FinViz: `https://finviz.com/quote.ashx?t=${userInputTicker}&p=m`,
+      "Yahoo Details": `https://finance.yahoo.com/quote/${userInputTicker}`,
+      "Yahoo Analysis": `https://finance.yahoo.com/quote/${userInputTicker}/analysis`,
+      "Yahoo Historic Dividends": `https://finance.yahoo.com/quote/${userInputTicker}/history?period1=345427200&period2=${curtimeEpoch}&interval=capitalGain%7Cdiv%7Csplit&filter=div&frequency=1d&includeAdjustedClose=true`,
+      "Yahoo Lookup": `https://finance.yahoo.com/lookup?s=${userInputTicker}`,
+      "Danelfin": `https://danelfin.com/stock/${userInputTicker}`,
     };
 
     info_links = "";
     for (let link in linksToCreate) {
-      info_links += `<a href="${linksToCreate[link]}" target="_blank">${link} for '${userInput}'</a><br/>`;
+      info_links += `<a href="${linksToCreate[link]}" target="_blank">${link} for '${userInputTicker}'</a><br/>`;
     }
   }
   async function createSaticInfoGraphs() {
     info_graphs = "";
     let img_style = 'style="width: 100%; height: auto; padding-top: 5px;"';
-    info_graphs += `<a href="https://finviz.com/quote.ashx?t=${userInput}&p=m" target="_blank"><img ${img_style} src="https://charts2-node.finviz.com/chart.ashx?cs=m&t=${userInput}&tf=d&s=linear&ct=candle_stick"/></a>`;
-    let history_graph_12m_url = `${api_url}/image/history/${userInput}/period/12mo`;
+    info_graphs += `<a href="https://finviz.com/quote.ashx?t=${userInputTicker}&p=m" target="_blank"><img ${img_style} src="https://charts2-node.finviz.com/chart.ashx?cs=m&t=${userInputTicker}&tf=d&s=linear&ct=candle_stick"/></a>`;
+    let history_graph_12m_url = `${api_url}/image/history/${userInputTicker}/period/12mo`;
     info_graphs += `<a href="${history_graph_12m_url}" target="_blank"><img ${img_style} src="${history_graph_12m_url}"/></a>`;
     
-    let history_graph_24m_url = `${api_url}/image/history/${userInput}/period/24mo`;
+    let history_graph_24m_url = `${api_url}/image/history/${userInputTicker}/period/24mo`;
     info_graphs += `<a href="${history_graph_24m_url}" target="_blank"><img ${img_style} src="${history_graph_24m_url}"/></a>`;
-    let history_graph_400m_url = `${api_url}/image/history/${userInput}/period/400mo`;
+    let history_graph_400m_url = `${api_url}/image/history/${userInputTicker}/period/400mo`;
     info_graphs += `<a href="${history_graph_400m_url}" target="_blank"><img ${img_style} src="${history_graph_400m_url}"/></a>`;
   }
-  async function gptDataAndAnalysis() {
-    if (linksInfoOrNews == "info") {
-      await Promise.all([fetchInfoData(), load_info_gpt_analysis()]);
-    } else {
-      await Promise.all([fetchInfoData(), load_news_links(), load_news_gpt_analysis()]);
+  async function processInfoNewsOrChat() {
+    let functions_to_call = [];
+    functions_to_call.push(fetchInfoData());
+    if (activeInfoNewsChat == "info") {
+      functions_to_call.push(load_info_gpt_analysis());
+    } else if (activeInfoNewsChat == "news") {
+      functions_to_call.push(load_news_links());
+      functions_to_call.push(load_news_gpt_analysis());
+    } else if (activeInfoNewsChat == "chat") {
+      functions_to_call.push(load_chat_answer());
     }
+    await Promise.all(functions_to_call);
   }
   async function fetchInfoData() {
-    if (info_key_value_running || userInput == info_key_value_prev_input) {
+    if (info_key_value_running || userInputTicker == info_key_value_prev_input) {
       return;
     }
     let main_data_key = "info_key_value_pairs";
-    if(!result_cache_has_key(userInput, main_data_key)) {
+    if(!result_cache_has_key(userInputTicker, main_data_key)) {
       info_key_value_running = true;
       try {
-        if (userInput != info_key_value_prev_input) {
+        if (userInputTicker != info_key_value_prev_input) {
           infos_ticker_name = "";
           info_key_value_pairs = {'Loading.': 'Please wait...'};
         }
         await axios.get(
-          `${api_url}/data/${userInput}`, { headers: { 'password': password } }
+          `${api_url}/data/${userInputTicker}`, { headers: { 'password': password } }
         ).then(response => {
           console.log("response:", response);
-          info_key_value_prev_input = userInput;
-          result_cache_set(userInput, main_data_key, JSON.stringify(response.data));
-          result_cache_set(userInput, "infos_ticker_name", ` for ${response.data['shortName']} (${userInput})`);
+          info_key_value_prev_input = userInputTicker;
+          result_cache_set(userInputTicker, main_data_key, JSON.stringify(response.data));
+          result_cache_set(userInputTicker, "infos_ticker_name", ` for ${response.data['shortName']} (${userInputTicker})`);
         }).catch(error => {
           console.error("Error fetching data:", error);
           info_key_value_pairs = {'Error:': "Error fetching data: " + error};
@@ -158,29 +171,29 @@
         console.error("Error fetching data:", error);
       } 
     }
-    if (result_cache_has_key(userInput, main_data_key)) {
-      info_key_value_pairs = JSON.parse(result_cache_get(userInput, main_data_key));
-      infos_ticker_name = result_cache_get(userInput, "infos_ticker_name");
+    if (result_cache_has_key(userInputTicker, main_data_key)) {
+      info_key_value_pairs = JSON.parse(result_cache_get(userInputTicker, main_data_key));
+      infos_ticker_name = result_cache_get(userInputTicker, "infos_ticker_name");
     }
   }
   async function load_info_gpt_analysis() {
-    if (gpt_info_running || userInput == gpt_info_prev_input) {
+    if (gpt_info_running || userInputTicker == gpt_info_prev_input) {
       return;
     }
     let main_data_key = "gpt_info_analysis";
-    if(!result_cache_has_key(userInput, main_data_key)) {
+    if(!result_cache_has_key(userInputTicker, main_data_key)) {
       gpt_info_running = true;
       try {
-        if (userInput != gpt_info_prev_input) {
+        if (userInputTicker != gpt_info_prev_input) {
           gpt_info_info = "";
           gpt_info_analysis = 'Analysing. Please wait...';
         }
         await axios.get(
-          `${api_url}/gpt/analysis/${userInput}/yfinance`, { headers: { 'password': password } }
+          `${api_url}/gpt/analysis/${userInputTicker}/yfinance`, { headers: { 'password': password } }
         ).then(response => {
-          gpt_info_prev_input = userInput;
-          result_cache_set(userInput, main_data_key, response.data['analysis']);
-          result_cache_set(userInput, "gpt_info_info", " ("+response.data['source']+" for "+response.data['ticker']+")");
+          gpt_info_prev_input = userInputTicker;
+          result_cache_set(userInputTicker, main_data_key, response.data['analysis']);
+          result_cache_set(userInputTicker, "gpt_info_info", " ("+response.data['source']+" for "+response.data['ticker']+")");
         }).catch(error => {
           console.error("Error fetching data:", error);
           gpt_info_analysis = "Error fetching data: " + error;
@@ -192,27 +205,27 @@
         console.error("Error fetching gpt info analysis:", error);
       }
     }
-    if (result_cache_has_key(userInput, main_data_key)) {
-      gpt_info_analysis = result_cache_get(userInput, main_data_key);
-      gpt_info_info = result_cache_get(userInput, "gpt_info_info");
+    if (result_cache_has_key(userInputTicker, main_data_key)) {
+      gpt_info_analysis = result_cache_get(userInputTicker, main_data_key);
+      gpt_info_info = result_cache_get(userInputTicker, "gpt_info_info");
     }
   }
   async function load_news_links() {
-    if (news_links_running || userInput == news_links_prev_input) {
+    if (news_links_running || userInputTicker == news_links_prev_input) {
       return;
     }
     let main_data_key = "news_links_list";
-    if(!result_cache_has_key(userInput, main_data_key)) {
+    if(!result_cache_has_key(userInputTicker, main_data_key)) {
       news_links_running = true;
       try {
-        if (userInput != news_links_prev_input) {
+        if (userInputTicker != news_links_prev_input) {
           news_links_list = [];
         }
         await axios.get(
-          `${api_url}/data/${userInput}/news/overview`, { headers: { 'password': password } }
+          `${api_url}/data/${userInputTicker}/news/overview`, { headers: { 'password': password } }
         ).then(response => {
-          news_links_prev_input = userInput;
-          result_cache_set(userInput, main_data_key, JSON.stringify(response.data['news']['data']));
+          news_links_prev_input = userInputTicker;
+          result_cache_set(userInputTicker, main_data_key, JSON.stringify(response.data['news']['data']));
         }).catch(error => {
           console.error("Error fetching data:", error);
           news_links_list = [];
@@ -224,27 +237,27 @@
         console.error("Error fetching news links:", error);
       }
     }
-    if (result_cache_has_key(userInput, main_data_key)) {
-      news_links_list = JSON.parse(result_cache_get(userInput, main_data_key));
+    if (result_cache_has_key(userInputTicker, main_data_key)) {
+      news_links_list = JSON.parse(result_cache_get(userInputTicker, main_data_key));
     }
   }
   async function load_news_gpt_analysis() {
-    if (gpt_news_analysis_running || userInput == gpt_news_analysis_prev_input) {
+    if (gpt_news_analysis_running || userInputTicker == gpt_news_analysis_prev_input) {
       return;
     }
-    if(!result_cache_has_key(userInput, "gpt_news_analysis")) {
+    if(!result_cache_has_key(userInputTicker, "gpt_news_analysis")) {
       gpt_news_analysis_running = true;
       try {
-        if (userInput != gpt_news_analysis_prev_input) {
+        if (userInputTicker != gpt_news_analysis_prev_input) {
           gpt_news_info = "";
           gpt_news_analysis = 'Analysing. Please wait...';
         }
         await axios.get(
-          `${api_url}/gpt/analysis/${userInput}/news`, { headers: { 'password': password } }
+          `${api_url}/gpt/analysis/${userInputTicker}/news`, { headers: { 'password': password } }
         ).then(response => {
-          gpt_news_analysis_prev_input = userInput;
-          result_cache_set(userInput, "gpt_news_analysis", response.data['analysis']);
-          result_cache_set(userInput, "gpt_news_info", " ("+response.data['source']+" for "+response.data['ticker']+")");
+          gpt_news_analysis_prev_input = userInputTicker;
+          result_cache_set(userInputTicker, "gpt_news_analysis", response.data['analysis']);
+          result_cache_set(userInputTicker, "gpt_news_info", " ("+response.data['source']+" for "+response.data['ticker']+")");
         }).catch(error => {
           console.error("Error fetching data:", error);
           gpt_news_analysis = "Error fetching data: " + error;
@@ -256,9 +269,35 @@
         console.error("Error fetching gpt news analysis:", error);
       }
     }
-    if (result_cache_has_key(userInput, "gpt_news_analysis")) {
-      gpt_news_analysis = result_cache_get(userInput, "gpt_news_analysis");
-      gpt_news_info = result_cache_get(userInput, "gpt_news_info");
+    if (result_cache_has_key(userInputTicker, "gpt_news_analysis")) {
+      gpt_news_analysis = result_cache_get(userInputTicker, "gpt_news_analysis");
+      gpt_news_info = result_cache_get(userInputTicker, "gpt_news_info");
+    }
+  }
+  async function load_chat_answer() {
+    if (chat_answering_running) {
+      return;
+    }
+    chat_answering_running = true;
+    try {
+      chat_info = "";
+      chat_stats = "";
+      chat_answer = 'Reading, Thinking, Answering. Please wait...';
+      await axios.get(
+        `${api_url}/gpt/answer/${userInputTicker}/chat`, { params: { chatInput: chatInput }}, { headers: { 'password': password } }
+      ).then(response => {
+        chat_answer = response.data['analysis'];
+        chat_info = " ("+response.data['source']+" for "+response.data['ticker']+")";
+        let stats = response.data['stats'];
+        chat_stats = `p_len: ${stats['p_len']}, p_words: ${stats['p_words']}, duration_sec: ${stats['duration_sec']}`;
+      }).catch(error => {
+        console.error("Error fetching answer for chat:", error);
+        chat_answer = "Error fetching answer for chat: " + error;
+      }).finally(() => {
+        chat_answering_running = false;
+      });
+    } finally {
+      chat_answering_running = false;
     }
   }
   async function deleteTodaysCacheForStock() {
@@ -267,11 +306,11 @@
     }
     resetPrevInputValues();
     resetRunningStates();
-    result_cache_delete_today_stock(userInput);
+    result_cache_delete_today_stock(userInputTicker);
     delete_todays_cache_running = true;
     try {
       await axios.delete(
-        `${api_url}/cache/${userInput}/today`, { headers: { 'password': password } }
+        `${api_url}/cache/${userInputTicker}/today`, { headers: { 'password': password } }
       ).then(response => {
         console.log("response:", response);
       }).catch(error => {
@@ -284,16 +323,13 @@
       console.error("Error deleting cache:", error);
     }
   }
-  function activateLinksAndGptInfo() {
-    if (linksInfoOrNews != "info") {
-      linksInfoOrNews = "info";
-      processInputIfSet();
-    }
-  }
-  function activateNewsAndGptNews() {
-    if (linksInfoOrNews != "news") {
-      linksInfoOrNews = "news";
-      processInputIfSet();
+  function sectionActivated(event) {
+    let selectedSection = event.detail.selectedSection;
+    if (activeInfoNewsChat != selectedSection) {
+      activeInfoNewsChat = selectedSection;
+      if (selectedSection != "chat") {
+        processInputIfSet();
+      }
     }
   }
   function processInputIfSetWithFieldsUpdate(event) {
@@ -305,8 +341,12 @@
     deleteTodaysCacheInput();
   }
   function updateFieldsFromEvent(event) {
-    userInput = event.detail.userInput;
+    userInputTicker = event.detail.userInputTicker;
     password = event.detail.password;
+  }
+  function triggerChatWithStock(event) {
+    chatInput = event.detail.chatInput;
+    processInputIfSet();
   }
 </script>
 <InputFields  on:processInputIfSetWithFieldsUpdate={processInputIfSetWithFieldsUpdate} 
@@ -322,9 +362,11 @@
   <div class="row contentrow infos">
     <InfoKeyValue info_key_value_pairs={info_key_value_pairs} />
     <ChartGraphs info_graphs={info_graphs} />
-    <LinkNews on:activateLinksAndGptInfo={activateLinksAndGptInfo} on:activateNewsAndGptNews={activateNewsAndGptNews}
-      linksInfoOrNews={linksInfoOrNews} info_links={info_links} gpt_info_info={gpt_info_info} gpt_info_analysis={gpt_info_analysis}
+    <LinkNews
+      on:sectionActivated={sectionActivated} on:triggerChatWithStock={triggerChatWithStock}
+      activeInfoNewsChat={activeInfoNewsChat} info_links={info_links} gpt_info_info={gpt_info_info} gpt_info_analysis={gpt_info_analysis}
       news_links_list={news_links_list} gpt_news_info={gpt_news_info} gpt_news_analysis={gpt_news_analysis}
+      userInputTicker={userInputTicker} chatInput={chatInput} chat_info={chat_info} chat_stats={chat_stats} chat_answer={chat_answer}
     />
   </div>
 {/if}
