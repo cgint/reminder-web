@@ -284,7 +284,7 @@
       chat_stats = "";
       chat_answer = 'Reading, Thinking, Answering. Please wait...';
       await axios.get(
-        `${api_url}/gpt/answer/${userInputTicker}/chat`, { params: { chatInput: chatInput }}, { headers: { 'password': password } }
+        `${api_url}/gpt/answer/${userInputTicker}/chat`, { params: { chatInput: chatInput },  headers: { 'password': password } }
       ).then(response => {
         chat_answer = response.data['analysis'];
         chat_info = " ("+response.data['source']+" for "+response.data['ticker']+")";
