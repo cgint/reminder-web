@@ -1,14 +1,16 @@
 <script>
-    export let processingValue, processingCount;
+  import { processing } from "../storeProcessing.js";
+  $: processingValue = $processing.processingValue;
+  $: processingCount = $processing.processingCount;
 </script>
 
 <div class="col-auto processingtext">
-    {#if processingValue != ""}
-        <div class="spinner-grow spinner-grow-sm" role="status">
-            <span class="visually-hidden">({processingCount}) loading ...</span>
-        </div>
-        {processingCount} loading ...
-    {/if}
+  {#if processingValue != ""}
+    <div class="spinner-grow spinner-grow-sm" role="status">
+      <span class="visually-hidden">({processingCount}) loading ...</span>
+    </div>
+    {processingCount} loading ...
+  {/if}
 </div>
 
 <style>
@@ -18,4 +20,3 @@
     color: darkgray;
   }
 </style>
-

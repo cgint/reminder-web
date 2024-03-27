@@ -2,7 +2,7 @@
     import Login from './Login.svelte';
     import AuthStatusBanner from './AuthStatusBanner.svelte';
     import App from './App.svelte';
-    import { auth } from './authStore.js'; // Import the store
+    import { auth } from './storeAuth.js'; // Import the store
 
     // Reactive subscription to the store
     $: isAuthenticated = $auth.isAuthenticated;

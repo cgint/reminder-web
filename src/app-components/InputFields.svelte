@@ -1,12 +1,18 @@
 <script>
   import { onMount } from "svelte";
+  import axios from "axios";
+  import { api_url } from "../constants.js";
   import ProcessingText from "./ProcessingText.svelte";
-  export let processingValue, processingCount;
+  import { result_cache_delete_today_stock } from "./result_cache.js";
+  import { bearer } from "../storeBearer.js";
+  import { processing } from "../storeProcessing.js";
+  import { tickerInput } from "../storeTickerInput.js";
+  import { prevInput } from "../storePrevInput.js";
+
   let userInputTicker = "";
   let password = "";
 
-  import { createEventDispatcher } from "svelte";
-  const dispatch = createEventDispatcher();
+  let delete_todays_cache_running = false;
 
   function triggerOnEnter(event) {
     if (event.key === "Enter") {
@@ -14,13 +20,48 @@
     }
   }
   function processInputIfSet() {
-    dispatch("processInputIfSetWithFieldsUpdate", {userInputTicker: getUpperCaseInputForAction(), password: password});
+    bearer.setBearer(password);
+    tickerInput.setTicker(getUpperCaseInputForAction());
   }
-  function deleteTodaysCacheInput() {
-    dispatch("deleteTodaysCacheInputWithFieldsUpdate", {userInputTicker: getUpperCaseInputForAction(), password: password});
+
+  async function deleteTodaysCacheInput() {
+    processing.startProcessing();
+    try {
+      if (userInputTicker) {
+        await deleteTodaysCacheForStock();
+      }
+    } finally {
+      processing.stopProcessing();
+    }
   }
-  function formInputChangeAnyField() {
-    dispatch("formInputChange", {userInputTicker: getUpperCaseInputForAction(), password: password});
+  function resetPrevInputValues() {
+    prevInput.clear();
+  }
+  async function deleteTodaysCacheForStock() {
+    if (delete_todays_cache_running) {
+      return;
+    }
+    resetPrevInputValues();
+    result_cache_delete_today_stock(userInputTicker);
+    delete_todays_cache_running = true;
+    try {
+      await axios
+        .delete(`${api_url}/cache/${userInputTicker}/today`, {
+          headers: { password: password },
+        })
+        .then((response) => {
+          console.log("response:", response);
+        })
+        .catch((error) => {
+          console.error("Error deleting cache:", error);
+        })
+        .finally(() => {
+          delete_todays_cache_running = false;
+        });
+    } catch (error) {
+      delete_todays_cache_running = false;
+      console.error("Error deleting cache:", error);
+    }
   }
 
   onMount(() => {
@@ -35,18 +76,22 @@
   });
 
   function storeUserFieldsInStorage(userInputTicker, password) {
-    localStorage.setItem('userInputTicker', userInputTicker);
-    localStorage.setItem('password', password);
+    localStorage.setItem("userInputTicker", userInputTicker);
+    localStorage.setItem("password", password);
+  }
+  function storePasswordAsBearer(password) {
+    bearer.setBearer(password);
   }
   function fetchAndPutToInputUserFieldsFromStorage() {
-    userInputTicker = localStorage.getItem('userInputTicker') || "";
-    password = localStorage.getItem('password') || "";
+    userInputTicker = localStorage.getItem("userInputTicker") || "";
+    password = localStorage.getItem("password") || "";
   }
 
   function getUpperCaseInputForAction() {
     if (userInputTicker) {
       userInputTicker = userInputTicker.toUpperCase().trim();
       storeUserFieldsInStorage(userInputTicker, password);
+      storePasswordAsBearer(password);
     }
     return userInputTicker;
   }
@@ -57,7 +102,6 @@
       input.select();
     }
   }
-  // Add event listener to set focus on input when 'f' key is pressed
   window.addEventListener("keydown", (event) => {
     if (event.shiftKey && event.key === "/") {
       focus_on_ticker_input();
@@ -65,24 +109,41 @@
     }
   });
 </script>
+
 <div class="row inputfields wide d-none d-md-block">
   <div class="col">
     <div class="row">
       <div class="col-auto">
-        <input type="text" on:change={formInputChangeAnyField} bind:value={userInputTicker} placeholder="'VZ', 'T', ..." on:keydown={triggerOnEnter} class="form-control" />
+        <input
+          type="text"
+          bind:value={userInputTicker}
+          placeholder="'VZ', 'T', ..."
+          on:keydown={triggerOnEnter}
+          class="form-control"
+        />
       </div>
       <div class="col-auto">
-        <input type="password" bind:value={password} placeholder="Password" on:keydown={triggerOnEnter} class="form-control" />
+        <input
+          type="password"
+          bind:value={password}
+          placeholder="Password"
+          on:keydown={triggerOnEnter}
+          class="form-control"
+        />
       </div>
       <div class="col-auto">
-        <button on:click={processInputIfSet} class="btn btn-primary">Fetch Data</button>
+        <button on:click={processInputIfSet} class="btn btn-primary"
+          >Fetch Data</button
+        >
       </div>
       {#if userInputTicker != ""}
         <div class="col-auto">
-          <button on:click={deleteTodaysCacheInput} class="btn btn-warning">Del stock cache today</button>
+          <button on:click={deleteTodaysCacheInput} class="btn btn-warning"
+            >Del stock cache today</button
+          >
         </div>
       {/if}
-      <ProcessingText processingValue={processingValue} processingCount={processingCount} />
+      <ProcessingText />
     </div>
   </div>
 </div>
@@ -90,24 +151,40 @@
   <div class="col-12">
     <div class="row">
       <div class="col-auto">
-        <input type="text" bind:value={userInputTicker} placeholder="Ticker-Symbol 'T', ..." on:keydown={triggerOnEnter} class="form-control" />
+        <input
+          type="text"
+          bind:value={userInputTicker}
+          placeholder="Ticker-Symbol 'T', ..."
+          on:keydown={triggerOnEnter}
+          class="form-control"
+        />
       </div>
       <div class="col-auto">
-        <button on:click={processInputIfSet} class="btn btn-primary">Fetch Data</button>
+        <button on:click={processInputIfSet} class="btn btn-primary"
+          >Fetch Data</button
+        >
       </div>
-      <ProcessingText processingValue={processingValue} processingCount={processingCount} />
+      <ProcessingText />
     </div>
   </div>
   <div class="row inputfields narrow d-block d-md-none">
     <div class="col-12">
       <div class="row">
         <div class="col-auto">
-          <input type="password" bind:value={password} placeholder="Password" on:keydown={triggerOnEnter} class="form-control" />
+          <input
+            type="password"
+            bind:value={password}
+            placeholder="Password"
+            on:keydown={triggerOnEnter}
+            class="form-control"
+          />
         </div>
         {#if userInputTicker != ""}
-        <div class="col-auto">
-          <button on:click={deleteTodaysCacheInput} class="btn btn-warning">Del stock cache today</button>
-        </div>
+          <div class="col-auto">
+            <button on:click={deleteTodaysCacheInput} class="btn btn-warning"
+              >Del stock cache today</button
+            >
+          </div>
         {/if}
       </div>
     </div>
@@ -122,4 +199,3 @@
     width: 5em;
   }
 </style>
-
