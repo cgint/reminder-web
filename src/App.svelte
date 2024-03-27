@@ -40,7 +40,7 @@
   let chat_answering_running = false;
   let chat_info = "";
   let chat_stats = "";
-  let chat_answer = "";
+  let chat_answer = "No question - no answer ;) Please provide a question for me to answer.";
 
   let processingCount = 0;
   let processingValue = "";
@@ -275,7 +275,7 @@
     }
   }
   async function load_chat_answer() {
-    if (chat_answering_running) {
+    if (chat_answering_running || chatInput == "") {
       return;
     }
     chat_answering_running = true;

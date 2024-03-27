@@ -31,6 +31,7 @@
     }
 
     function triggerChatWithStock() {
+        chatInput = chatInput.trim();
         storeChatInputInStorage(chatInput);
         dispatch("triggerChatWithStock", { chatInput });
     }
