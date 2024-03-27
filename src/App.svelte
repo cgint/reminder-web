@@ -282,7 +282,7 @@
     try {
       chat_info = "";
       chat_stats = "";
-      chat_answer = 'Reading, Thinking, Answering. Please wait...';
+      chat_answer = 'Reading infos, news and other gpt-summaries ... then thinking ... then answering. Please wait...';
       await axios.get(
         `${api_url}/gpt/answer/${userInputTicker}/chat`, { params: { chatInput: chatInput },  headers: { 'password': password } }
       ).then(response => {
