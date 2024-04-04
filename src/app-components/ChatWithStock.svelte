@@ -95,3 +95,15 @@
 <div class="contentindent min-height-300 gpt-result">
     <i>{@html chat_answer}</i>
 </div>
+
+<style>
+    .gpt-result {
+        color: rgb(90, 90, 90);
+    }
+    .contentindent {
+        padding-left: 5px;
+    }
+    .min-height-300 {
+        min-height: 300px;
+    }
+</style>

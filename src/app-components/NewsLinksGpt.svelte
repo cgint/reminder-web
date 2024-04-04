@@ -21,6 +21,7 @@
 
     let gpt_news_analysis = "";
     let gpt_news_info = "";
+    let gpt_news_stats = "";
     $: gpt_news_analysis_prev_input = $prevInput.gpt_news_analysis_prev_input;
     let gpt_news_analysis_running = false;
 
@@ -91,6 +92,7 @@
             try {
                 if (userInputTicker != gpt_news_analysis_prev_input) {
                     gpt_news_info = "";
+                    gpt_news_stats = "";
                     gpt_news_analysis = "Analysing. Please wait...";
                 }
                 await axios
@@ -113,6 +115,8 @@
                                 response.data["ticker"] +
                                 ")",
                         );
+                        let stats = response.data['stats'];
+                        gpt_news_stats = `p_len: ${stats['p_len']}, p_words: ${stats['p_words']}, duration_sec: ${stats['duration_sec']}`;
                     })
                     .catch((error) => {
                         console.error("Error fetching data:", error);
@@ -149,7 +153,7 @@
     {/each}
 </div>
 <br /><br />
-<strong>GPT-News-Analysis{gpt_news_info}:</strong><br />
+<strong title="{gpt_news_stats}">GPT-News-Analysis{gpt_news_info}:</strong><br />
 <div class="contentindent min-height-300 gpt-result">
     <i>{@html gpt_news_analysis}</i>
 </div>

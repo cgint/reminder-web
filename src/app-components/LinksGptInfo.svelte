@@ -20,6 +20,7 @@
     $: gpt_info_prev_input = $prevInput.gpt_info_prev_input;
     let gpt_info_analysis = "";
     let gpt_info_info = "";
+    let gpt_info_stats = "";
 
     onMount(async () => {
         await fetchAll();
@@ -80,6 +81,8 @@
                                 response.data["ticker"] +
                                 ")",
                         );
+                        let stats = response.data['stats'];
+                        gpt_info_stats = `p_len: ${stats['p_len']}, p_words: ${stats['p_words']}, duration_sec: ${stats['duration_sec']}`;
                     })
                     .catch((error) => {
                         console.error("Error fetching data:", error);
@@ -108,7 +111,7 @@
     {@html info_links}
 </div>
 <br /><br />
-<strong>GPT-Info-Analysis{gpt_info_info}:</strong><br />
+<strong title="{gpt_info_stats}">GPT-Info-Analysis{gpt_info_info}:</strong><br />
 <div class="contentindent min-height-300 gpt-result">
     <i>{@html gpt_info_analysis}</i>
 </div>
