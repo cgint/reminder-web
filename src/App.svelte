@@ -48,13 +48,13 @@
     info_graphs = "";
     let img_style = 'style="width: 100%; height: auto; padding-top: 5px;"';
     info_graphs += `<a href="https://finviz.com/quote.ashx?t=${userInputTicker}&p=m" target="_blank"><img ${img_style} src="https://charts2-node.finviz.com/chart.ashx?cs=m&t=${userInputTicker}&tf=d&s=linear&ct=candle_stick"/></a>`;
-    let history_graph_12m_url = `${api_url}/image/history/${userInputTicker}/period/12mo`;
-    info_graphs += `<a href="${history_graph_12m_url}" target="_blank"><img ${img_style} src="${history_graph_12m_url}"/></a>`;
+    let history_graph_1y_url = `${api_url}/image/history/${userInputTicker}/period/1y`;
+    info_graphs += `<a href="${history_graph_1y_url}" target="_blank"><img ${img_style} src="${history_graph_1y_url}"/></a>`;
     
-    let history_graph_24m_url = `${api_url}/image/history/${userInputTicker}/period/24mo`;
-    info_graphs += `<a href="${history_graph_24m_url}" target="_blank"><img ${img_style} src="${history_graph_24m_url}"/></a>`;
-    let history_graph_400m_url = `${api_url}/image/history/${userInputTicker}/period/400mo`;
-    info_graphs += `<a href="${history_graph_400m_url}" target="_blank"><img ${img_style} src="${history_graph_400m_url}"/></a>`;
+    let history_graph_2y_url = `${api_url}/image/history/${userInputTicker}/period/2y`;
+    info_graphs += `<a href="${history_graph_2y_url}" target="_blank"><img ${img_style} src="${history_graph_2y_url}"/></a>`;
+    let history_graph_10y_url = `${api_url}/image/history/${userInputTicker}/period/10y`;
+    info_graphs += `<a href="${history_graph_10y_url}" target="_blank"><img ${img_style} src="${history_graph_10y_url}"/></a>`;
   }
   async function fetchInfoData() {
     if (info_key_value_running || userInputTicker == info_key_value_prev_input) {
