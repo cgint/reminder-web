@@ -1,7 +1,7 @@
-name = "fin-ass-web"
-compatibility_date = "2024-03-14"
+name = "reminder-web"
+compatibility_date = "2024-06-19"
 routes = [
-	{ pattern = "fin-ass.c-gint.com", custom_domain = true }
+	{ pattern = "reminder.c-gint.com", custom_domain = true }
 ]
 
 # Variable bindings. These are arbitrary, plaintext strings (similar to environment variables)
