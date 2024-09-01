@@ -9,7 +9,7 @@
     $: userEmail = $auth.userEmail;
 
 </script>
-
+1
 {#if !isAuthenticated}
   <Login authStore={auth} />
 {:else}
