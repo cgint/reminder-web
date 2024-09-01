@@ -20,8 +20,9 @@
     }
   }
   function processInputIfSet() {
+    console.log("URL entered:", userInputTicker); // Log the entered URL
     bearer.setBearer(password);
-    tickerInput.setTicker(getUpperCaseInputForAction());
+    tickerInput.setTicker(getInputForAction());
   }
 
   async function deleteTodaysCacheInput() {
@@ -87,9 +88,9 @@
     password = localStorage.getItem("password") || "";
   }
 
-  function getUpperCaseInputForAction() {
+  function getInputForAction() {
     if (userInputTicker) {
-      userInputTicker = userInputTicker.toUpperCase().trim();
+      userInputTicker = userInputTicker.trim();
       storeUserFieldsInStorage(userInputTicker, password);
       storePasswordAsBearer(password);
     }
@@ -102,12 +103,6 @@
       input.select();
     }
   }
-  window.addEventListener("keydown", (event) => {
-    if (event.shiftKey && event.key === "/") {
-      focus_on_ticker_input();
-      event.preventDefault();
-    }
-  });
 </script>
 
 <div class="row inputfields wide d-none d-md-block">
@@ -117,7 +112,7 @@
         <input
           type="text"
           bind:value={userInputTicker}
-          placeholder="'VZ', 'T', ..."
+          placeholder="https://..."
           on:keydown={triggerOnEnter}
           class="form-control"
         />
@@ -154,7 +149,7 @@
         <input
           type="text"
           bind:value={userInputTicker}
-          placeholder="Ticker-Symbol 'T', ..."
+          placeholder="https://..."
           on:keydown={triggerOnEnter}
           class="form-control"
         />

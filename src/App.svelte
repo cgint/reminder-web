@@ -1,9 +1,6 @@
 <script>
   import { onMount } from 'svelte';
   import InputFields from "./app-components/InputFields.svelte";
-  import InfoKeyValue from "./app-components/InfoKeyValue.svelte";
-  import ChartGraphs from "./app-components/ChartGraphs.svelte";
-  import LinkNews from "./app-components/LinkNews.svelte";
   import { api_url } from "./constants.js";
   import { prevInput } from './storePrevInput.js';
   import { tickerInput } from './storeTickerInput.js';
@@ -21,13 +18,10 @@
   }
 
   let infos_ticker_name ="";
-  let info_graphs = "";
   
-  let info_key_value_pairs = {};
+  let result_html = "";
   $: info_key_value_prev_input = $prevInput.info_key_value_prev_input;
   let info_key_value_running = false;
-  
-  let activeInfoNewsChat = "info";
   
   onMount(async () => {
         await processInputIfSet();
@@ -38,23 +32,11 @@
     processing.startProcessing();
     try {
       if (userInputTicker) {
-        await Promise.all([createSaticInfoGraphs(), fetchInfoData()]);
+        await Promise.all([fetchInfoData()]);
       }
     } finally {
       processing.stopProcessing();
     }
-  }
-  async function createSaticInfoGraphs() {
-    info_graphs = "";
-    let img_style = 'style="width: 100%; height: auto; padding-top: 5px;"';
-    info_graphs += `<a href="https://finviz.com/quote.ashx?t=${userInputTicker}&p=m" target="_blank"><img ${img_style} src="https://charts2-node.finviz.com/chart.ashx?cs=m&t=${userInputTicker}&tf=d&s=linear&ct=candle_stick"/></a>`;
-    let history_graph_1y_url = `${api_url}/image/history/${userInputTicker}/period/1y`;
-    info_graphs += `<a href="${history_graph_1y_url}" target="_blank"><img ${img_style} src="${history_graph_1y_url}"/></a>`;
-    
-    let history_graph_2y_url = `${api_url}/image/history/${userInputTicker}/period/2y`;
-    info_graphs += `<a href="${history_graph_2y_url}" target="_blank"><img ${img_style} src="${history_graph_2y_url}"/></a>`;
-    let history_graph_10y_url = `${api_url}/image/history/${userInputTicker}/period/10y`;
-    info_graphs += `<a href="${history_graph_10y_url}" target="_blank"><img ${img_style} src="${history_graph_10y_url}"/></a>`;
   }
   async function fetchInfoData() {
     if (info_key_value_running || userInputTicker == info_key_value_prev_input) {
@@ -66,18 +48,16 @@
       try {
         if (userInputTicker != info_key_value_prev_input) {
           infos_ticker_name = "";
-          info_key_value_pairs = {'Loading.': 'Please wait...'};
+          result_html = 'Loading...';
         }
-        await axios.get(
-          `${api_url}/data/${userInputTicker}`, { headers: { 'password': password } }
-        ).then(response => {
+        console.log("userInputTicker:", userInputTicker);
+        await axios.post('/api/fetch-info', { userInputTicker }).then(response => {
           console.log("response:", response);
           info_key_value_prev_input = userInputTicker;
-          result_cache_set(userInputTicker, main_data_key, JSON.stringify(response.data));
-          result_cache_set(userInputTicker, "infos_ticker_name", ` for ${response.data['shortName']} (${userInputTicker})`);
+          result_cache_set(userInputTicker, main_data_key, response.data);
         }).catch(error => {
           console.error("Error fetching data:", error);
-          info_key_value_pairs = {'Error:': "Error fetching data: " + error};
+          result_html = "Error fetching data: " + error;
         }).finally(() => {
           info_key_value_running = false;
         });
@@ -87,20 +67,10 @@
       } 
     }
     if (result_cache_has_key(userInputTicker, main_data_key)) {
-      info_key_value_pairs = JSON.parse(result_cache_get(userInputTicker, main_data_key));
-      infos_ticker_name = result_cache_get(userInputTicker, "infos_ticker_name");
+      result_html = result_cache_get(userInputTicker, main_data_key);
     }
   }
 
-  function sectionActivated(event) {
-    let selectedSection = event.detail.selectedSection;
-    if (activeInfoNewsChat != selectedSection) {
-      activeInfoNewsChat = selectedSection;
-      if (selectedSection != "chat") {
-        processInputIfSet();
-      }
-    }
-  }
   function deleteTodaysCacheInputWithFieldsUpdate(event) {
     deleteTodaysCacheInput();
   }
@@ -109,17 +79,13 @@
 {#if userInputTicker != ""}
   <div class="row">
     <div class="col-12">
-      <h3>Infos{infos_ticker_name}</h3>
+      <h3>Infos</h3>
     </div>
   </div>
   <div class="row contentrow infos">
-    <InfoKeyValue info_key_value_pairs={info_key_value_pairs} />
-    <ChartGraphs info_graphs={info_graphs} />
-    <LinkNews
-      on:sectionActivated={sectionActivated}
-      userInputTicker={userInputTicker}
-      activeInfoNewsChat={activeInfoNewsChat}
-    />
+    <div class="col-12">
+      <p>{result_html}</p>
+    </div>
   </div>
 {/if}
 
