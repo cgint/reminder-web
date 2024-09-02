@@ -5,7 +5,7 @@ function createBearerStore() {
 
     return {
         subscribe,
-        setBearer: (bearer) => {
+        setBearer: (bearer: string) => {
             set({ bearer });
         }
     };

@@ -1,15 +1,15 @@
 <script>
-    import Login from './Login.svelte';
-    import AuthStatusBanner from './AuthStatusBanner.svelte';
-    import App from './App.svelte';
-    import { auth } from './storeAuth.js'; // Import the store
+    import Login from '../components/Login.svelte';
+    import AuthStatusBanner from '../components/AuthStatusBanner.svelte';
+    import App from '../components/App.svelte';
+    import { auth } from './storeAuth.ts';
 
     // Reactive subscription to the store
     $: isAuthenticated = $auth.isAuthenticated;
     $: userEmail = $auth.userEmail;
 
 </script>
-1
+
 {#if !isAuthenticated}
   <Login authStore={auth} />
 {:else}

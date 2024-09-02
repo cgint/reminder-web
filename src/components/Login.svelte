@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
     import { onMount } from 'svelte';
-    export let authStore;
+    export let authStore: any;
     
-    function authChanged(isAuthenticated, userEmail) {
+    function authChanged(isAuthenticated: boolean, userEmail: string) {
         authStore.setAuthState(isAuthenticated, userEmail);
     }
 
@@ -14,12 +14,12 @@
 
     function checkAuthenticationOnLoadIsAuthenticated() {
         let isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
-        let userEmail = isAuthenticated ? localStorage.getItem("userEmail") : "";
+        let userEmail = isAuthenticated ? localStorage.getItem("userEmail") || "" : "";
         authChanged(isAuthenticated, userEmail);
         return isAuthenticated;
     }
 
-    function handleCredentialResponse(response) {
+    function handleCredentialResponse(response: any) {
         let token = response.credential;
         const payload = JSON.parse(atob(token.split(".")[1]));
         let isAuthenticated = false;

@@ -1,6 +1,6 @@
-<script>
-    export let authStore;
-    export let userEmail;
+<script lang="ts">
+    export let authStore: any;
+    export let userEmail: string;
 </script>
 
 <div class="row auth-status-banner">

@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 
-function createAuthStore(logoutListenerFunction) {
+function createAuthStore(logoutListenerFunction: () => void) {
     const { subscribe, set } = writable({ isAuthenticated: false, userEmail: '' });
 
     return {
@@ -9,7 +9,7 @@ function createAuthStore(logoutListenerFunction) {
             set({ isAuthenticated: false, userEmail: '' });
             logoutListenerFunction();
         },
-        setAuthState: (isAuthenticated, userEmail) => {
+        setAuthState: (isAuthenticated: boolean, userEmail: string) => {
             set({ isAuthenticated, userEmail });
         }
     };
